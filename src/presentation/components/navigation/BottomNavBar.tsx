@@ -1,12 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { Home, Map, Bell, User } from 'lucide-react-native';
-import { BlurView } from 'expo-blur';
+import React, { useState, useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  TouchableWithoutFeedback,
+  Animated,
+} from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Colors } from '../../../theme/colors';
 import { VarunaOrb } from '../brand/VarunaOrb';
+import { NavContourBackdrop } from './NavContourBackdrop';
+import { NavLaserIndicator } from './NavLaserIndicator';
+import { NavTabButton, TabId } from './NavTabButton';
 
-const { width } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get('window');
 
 export type TabType = 'home' | 'map' | 'ai' | 'alerts' | 'profile';
 
@@ -19,199 +26,212 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   currentTab,
   onSelectTab,
 }) => {
+  // Fluid responsive width: full pill with comfortable horizontal margins
+  const navWidth = Math.min(screenWidth - 24, 430);
+  const navHeight = 88; // Total canvas height including raised center dome
+
+  // Track the center X of each tab for the sliding laser beam
+  const [tabPositions, setTabPositions] = useState<{ [key in TabId]?: number }>({
+    home: navWidth * 0.13,
+    map: navWidth * 0.31,
+    alerts: navWidth * 0.69,
+    profile: navWidth * 0.87,
+  });
+
+  // Center Orb touch spring controller
+  const orbScaleAnim = useRef(new Animated.Value(1)).current;
+  const orbGlowPulse = useRef(new Animated.Value(1)).current;
+
   const handleTabPress = (tab: TabType) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSelectTab(tab);
   };
 
+  const handleOrbPressIn = () => {
+    Animated.spring(orbScaleAnim, {
+      toValue: 0.9,
+      damping: 14,
+      stiffness: 280,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleOrbPressOut = () => {
+    Animated.spring(orbScaleAnim, {
+      toValue: 1.0,
+      damping: 8,
+      stiffness: 180,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleOrbPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    // Cosmic pulse burst animation
+    Animated.sequence([
+      Animated.timing(orbGlowPulse, {
+        toValue: 1.2,
+        duration: 140,
+        useNativeDriver: true,
+      }),
+      Animated.spring(orbGlowPulse, {
+        toValue: 1.0,
+        friction: 5,
+        tension: 160,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    onSelectTab('ai');
+  };
+
+  // Determine active indicator position
+  const activeTabId = currentTab !== 'ai' ? (currentTab as TabId) : undefined;
+  const targetIndicatorX = activeTabId && tabPositions[activeTabId] !== undefined
+    ? tabPositions[activeTabId]!
+    : navWidth / 2;
+
+  const isIndicatorVisible = currentTab !== 'ai';
+
   return (
-    <View style={styles.outerContainer}>
-      <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFillObject} />
+    <View style={[styles.floatingWrapper, { width: navWidth }]}>
+      {/* 1. Precision Contoured Glass Backdrop (Monolithic Center Dome & Grazing Rim) */}
+      <NavContourBackdrop width={navWidth} height={navHeight} />
 
-      <View style={styles.navBar}>
-        {/* Tab 1: Home */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleTabPress('home')}
-          style={styles.tabItem}
-        >
-          <Home
-            size={22}
-            color={currentTab === 'home' ? '#38bdf8' : '#8da2be'}
+      {/* 2. Sliding Electric Laser Beam Active Indicator */}
+      <NavLaserIndicator
+        targetX={targetIndicatorX}
+        visible={isIndicatorVisible}
+      />
+
+      {/* 3. Tab Navigation Items Container */}
+      <View style={[styles.tabContentBar, { width: navWidth }]}>
+        {/* Left Tab 1: Home */}
+        <View style={styles.tabColumn}>
+          <NavTabButton
+            id="home"
+            label="Home"
+            isActive={currentTab === 'home'}
+            onPress={() => handleTabPress('home')}
+            onLayout={(e) => {
+              const { x, width } = e.nativeEvent.layout;
+              setTabPositions((prev) => ({ ...prev, home: x + width / 2 }));
+            }}
           />
-          <Text
-            style={[
-              styles.tabLabel,
-              currentTab === 'home' && styles.tabLabelActive,
-            ]}
-          >
-            Home
-          </Text>
-        </TouchableOpacity>
-
-        {/* Tab 2: Map */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleTabPress('map')}
-          style={styles.tabItem}
-        >
-          <Map
-            size={22}
-            color={currentTab === 'map' ? '#38bdf8' : '#8da2be'}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              currentTab === 'map' && styles.tabLabelActive,
-            ]}
-          >
-            Map
-          </Text>
-        </TouchableOpacity>
-
-        {/* Center Raised Signature VARUNA Orb */}
-        <View style={styles.centerOrbWrapper}>
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={() => handleTabPress('ai')}
-            style={styles.centerOrbButton}
-          >
-            <VarunaOrb
-              size={56}
-              active={currentTab === 'ai'}
-              speed={currentTab === 'ai' ? 'fast' : 'normal'}
-              intensity={currentTab === 'ai' ? 1.3 : 1.0}
-            />
-          </TouchableOpacity>
         </View>
 
-        {/* Tab 4: Alerts */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleTabPress('alerts')}
-          style={styles.tabItem}
-        >
-          <View style={styles.alertIconContainer}>
-            <Bell
-              size={22}
-              color={currentTab === 'alerts' ? '#38bdf8' : '#8da2be'}
-            />
-            <View style={styles.alertNotificationDot} />
-          </View>
-          <Text
-            style={[
-              styles.tabLabel,
-              currentTab === 'alerts' && styles.tabLabelActive,
-            ]}
-          >
-            Alerts
-          </Text>
-        </TouchableOpacity>
-
-        {/* Tab 5: Profile */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleTabPress('profile')}
-          style={styles.tabItem}
-        >
-          <User
-            size={22}
-            color={currentTab === 'profile' ? '#38bdf8' : '#8da2be'}
+        {/* Left Tab 2: Map */}
+        <View style={styles.tabColumn}>
+          <NavTabButton
+            id="map"
+            label="Map"
+            isActive={currentTab === 'map'}
+            onPress={() => handleTabPress('map')}
+            onLayout={(e) => {
+              const { x, width } = e.nativeEvent.layout;
+              setTabPositions((prev) => ({ ...prev, map: x + width / 2 }));
+            }}
           />
-          <Text
-            style={[
-              styles.tabLabel,
-              currentTab === 'profile' && styles.tabLabelActive,
-            ]}
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
 
-      {/* iOS Home Indicator Bar */}
-      <View style={styles.homeIndicatorWrapper}>
-        <View style={styles.homeIndicator} />
+        {/* Center Raised Signature VARUNA Orb (AI Core) */}
+        <View style={styles.centerOrbAnchor}>
+          <TouchableWithoutFeedback
+            onPressIn={handleOrbPressIn}
+            onPressOut={handleOrbPressOut}
+            onPress={handleOrbPress}
+          >
+            <Animated.View
+              style={[
+                styles.orbTouchContainer,
+                {
+                  transform: [
+                    { scale: orbScaleAnim },
+                    { scale: orbGlowPulse },
+                  ],
+                },
+              ]}
+            >
+              <VarunaOrb
+                size={60}
+                active={true}
+                speed={currentTab === 'ai' ? 'fast' : 'normal'}
+                intensity={currentTab === 'ai' ? 1.35 : 1.0}
+                showGlow={true}
+              />
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        </View>
+
+        {/* Right Tab 3: Alerts */}
+        <View style={styles.tabColumn}>
+          <NavTabButton
+            id="alerts"
+            label="Alerts"
+            isActive={currentTab === 'alerts'}
+            hasBadge={true}
+            onPress={() => handleTabPress('alerts')}
+            onLayout={(e) => {
+              const { x, width } = e.nativeEvent.layout;
+              setTabPositions((prev) => ({ ...prev, alerts: x + width / 2 }));
+            }}
+          />
+        </View>
+
+        {/* Right Tab 4: Profile */}
+        <View style={styles.tabColumn}>
+          <NavTabButton
+            id="profile"
+            label="Profile"
+            isActive={currentTab === 'profile'}
+            onPress={() => handleTabPress('profile')}
+            onLayout={(e) => {
+              const { x, width } = e.nativeEvent.layout;
+              setTabPositions((prev) => ({ ...prev, profile: x + width / 2 }));
+            }}
+          />
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
+  floatingWrapper: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(3, 9, 18, 0.82)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    paddingTop: 8,
-    paddingBottom: 6,
+    bottom: Platform.OS === 'ios' ? 22 : 14,
+    alignSelf: 'center',
+    height: 88,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    zIndex: 9999,
   },
-  navBar: {
+  tabContentBar: {
+    height: 68,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     position: 'relative',
+    zIndex: 5,
   },
-  tabItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    minWidth: 54,
-    gap: 4,
-  },
-  tabLabel: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 10,
-    lineHeight: 12,
-    color: '#8da2be',
-  },
-  tabLabelActive: {
-    color: '#38bdf8',
-    fontFamily: 'Inter_500Medium',
-  },
-  centerOrbWrapper: {
-    top: -16,
+  tabColumn: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centerOrbButton: {
-    width: 60,
-    height: 60,
+  centerOrbAnchor: {
+    width: 66,
+    height: 66,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    top: -9, // Elevates the orb symmetrically into the center dome
+    zIndex: 10,
   },
-  alertIconContainer: {
-    position: 'relative',
-  },
-  alertNotificationDot: {
-    position: 'absolute',
-    top: -1,
-    right: -1,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#00e5ff',
-    borderWidth: 1,
-    borderColor: '#040b15',
-  },
-  homeIndicatorWrapper: {
+  orbTouchContainer: {
+    width: 64,
+    height: 64,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 6,
-    paddingBottom: 2,
-  },
-  homeIndicator: {
-    width: 134,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#ffffff',
-    opacity: 0.6,
   },
 });
-

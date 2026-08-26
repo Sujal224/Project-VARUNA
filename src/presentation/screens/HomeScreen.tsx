@@ -27,7 +27,6 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
-import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
 import { QuickActionsRow } from '../components/common/QuickActionsRow';
@@ -271,12 +270,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </Text>
             </TouchableOpacity>
           </ScrollView>
-
-          {/* Center Ocean Bathymetry & Radar Visualizer */}
-          <OceanRadarVisualizer
-            onPressPfz={() => onNavigateTab('map')}
-            onPressCyclone={() => onNavigateTab('alerts')}
-          />
 
           {/* Real-Time Conditions Master Liquid Glass Container */}
           <View style={styles.conditionsSection}>

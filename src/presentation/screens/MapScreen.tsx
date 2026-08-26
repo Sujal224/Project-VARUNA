@@ -369,7 +369,9 @@ const styles = StyleSheet.create({
     top: 2,
   },
   zoneDetailCard: {
-    margin: 16,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 96,
     backgroundColor: 'rgba(18, 33, 49, 0.75)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
