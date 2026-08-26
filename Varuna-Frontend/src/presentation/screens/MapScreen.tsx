@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,11 @@ import {
 } from '../components/map/MapFloatingControls';
 import { SelectedLocationSheet } from '../components/map/SelectedLocationSheet';
 import { TabType } from '../components/navigation/BottomNavBar';
+import { useLiveTelemetry } from '../../data/hooks/useLiveTelemetry';
+import { LocationSearchModal } from '../components/common/LocationSearchModal';
+import { mapRepository } from '../../data/repositories/mapRepository';
+
+
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -39,50 +44,147 @@ interface MapScreenProps {
   onNavigateTab?: (tab: TabType) => void;
 }
 
-const DEFAULT_LOCATION: MapMarkerLocation = {
-  id: 'pfz-main',
-  type: 'pfz',
-  name: 'Potential Fishing Zone',
-  region: 'Bay of Bengal',
-  coordinates: '14.23°N, 88.57°E',
-  lat: 14.23,
-  lng: 88.57,
-  condition: 'Safe Conditions',
-  metrics: {
-    seaTemp: '28.4 °C',
-    tempTrend: '↑ 0.3°C',
-    waveHeight: '0.8 – 1.2 m',
-    waveStatus: '• Stable',
-    windSpeed: '14 km/h',
-    windStatus: '↓ Calming',
-    chlorophyll: '2.4 mg/m³',
-    chloroStatus: '• High',
-  },
-  alerts: [
-    { id: 'a1', title: 'Strong Current', severity: 'Moderate', type: 'current' },
-    { id: 'a2', title: 'Small Craft Advisory', severity: 'Low Risk', type: 'advisory' },
-  ],
-};
-
 export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
 
+  const telemetry = useLiveTelemetry();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeControlTab, setActiveControlTab] = useState<MapControlTab>('layers');
-  const [selectedLocation, setSelectedLocation] = useState<MapMarkerLocation>(DEFAULT_LOCATION);
+  const [searchModalVisible, setSearchModalVisible] = useState(false);
+
+  const defaultLiveLocation: MapMarkerLocation = {
+    id: 'pfz-main',
+    type: 'pfz',
+    name: telemetry.locationName || 'Potential Fishing Zone',
+    region: telemetry.regionName || 'Bay of Bengal',
+    coordinates: `${telemetry.coordinates.latitude.toFixed(2)}°N, ${telemetry.coordinates.longitude.toFixed(2)}°E`,
+    lat: telemetry.coordinates.latitude,
+    lng: telemetry.coordinates.longitude,
+    condition: telemetry.risk?.level === 'LOW' ? 'Safe Conditions' : 'Advisory Active',
+    metrics: {
+      seaTemp: `${telemetry.conditions?.sea_temperature ?? 28.4} °C`,
+      tempTrend: '↑ 0.3°C',
+      waveHeight: `${telemetry.conditions?.wave_height ?? 1.2} m`,
+      waveStatus: '• Stable',
+      windSpeed: `${telemetry.conditions?.wave_speed ?? 14} km/h`,
+      windStatus: '↓ Calming',
+      chlorophyll: `${telemetry.conditions?.chlorophyll ?? 2.4} mg/m³`,
+      chloroStatus: '• High',
+    },
+    alerts: [
+      { id: 'a1', title: 'Strong Current', severity: 'Moderate', type: 'current' },
+      { id: 'a2', title: 'Small Craft Advisory', severity: 'Low Risk', type: 'advisory' },
+    ],
+  };
+
+  const [selectedLocation, setSelectedLocation] = useState<MapMarkerLocation>(defaultLiveLocation);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [sheetVisible, setSheetVisible] = useState<boolean>(true);
 
-  const handleSearchSubmit = () => {
+  // Synchronize location when live telemetry arrives or user selects a place
+  useEffect(() => {
+    if (telemetry.conditions) {
+      setSelectedLocation((prev) => ({
+        ...prev,
+        name: telemetry.locationName || prev.name,
+        region: telemetry.regionName || prev.region,
+        coordinates: `${telemetry.coordinates.latitude.toFixed(2)}°N, ${telemetry.coordinates.longitude.toFixed(2)}°E`,
+        lat: telemetry.coordinates.latitude,
+        lng: telemetry.coordinates.longitude,
+        metrics: {
+          ...prev.metrics,
+          seaTemp: `${telemetry.conditions?.sea_temperature} °C`,
+          waveHeight: `${telemetry.conditions?.wave_height} m`,
+          windSpeed: `${telemetry.conditions?.wave_speed} km/h`,
+        },
+      }));
+    }
+  }, [telemetry.conditions, telemetry.coordinates, telemetry.locationName]);
+
+  const handleSearchSubmit = async () => {
     if (searchQuery.trim().length > 0) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      try {
+        const results = await mapRepository.searchLocations(searchQuery, 1);
+        if (results && results.length > 0) {
+          const match = results[0];
+          telemetry.selectLocation(
+            { latitude: match.latitude, longitude: match.longitude },
+            match.name,
+            match.region || undefined
+          );
+          setSelectedLocation({
+            id: `loc-${match.id}`,
+            type: match.is_marine_port ? 'anchor' : 'pfz',
+            name: match.name,
+            region: match.region || 'Marine Sector',
+            coordinates: match.formatted_coordinates,
+            lat: match.latitude,
+            lng: match.longitude,
+            condition: 'Live Telemetry Synced',
+            metrics: {
+              seaTemp: `${telemetry.conditions?.sea_temperature ?? 28.4} °C`,
+              tempTrend: '↑ 0.2°C',
+              waveHeight: `${telemetry.conditions?.wave_height ?? 1.2} m`,
+              waveStatus: '• Stable',
+              windSpeed: `${telemetry.conditions?.wave_speed ?? 14} km/h`,
+              windStatus: '↓ Optimal',
+              chlorophyll: `${telemetry.conditions?.chlorophyll ?? 2.4} mg/m³`,
+              chloroStatus: '• High',
+            },
+            alerts: [
+              { id: 'a1', title: 'Open-Meteo Synced', severity: 'Low Risk', type: 'advisory' },
+            ],
+          });
+          setSheetVisible(true);
+          setZoomLevel(1.15);
+          setSearchQuery('');
+          return;
+        }
+      } catch (err) {
+        console.warn('Search error:', err);
+      }
+      setSearchModalVisible(true);
+    } else {
+      setSearchModalVisible(true);
     }
   };
 
+
   const handleLocateMe = () => {
-    setSelectedLocation(DEFAULT_LOCATION);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const lat = telemetry.coordinates.latitude;
+    const lng = telemetry.coordinates.longitude;
+    const speed = telemetry.gpsState.speedKnots;
+
+    setSelectedLocation({
+      id: 'vessel-varuna',
+      type: 'vessel',
+      name: 'Matsya Setu IV (Command)',
+      region: 'Visakhapatnam Transit Channel',
+      coordinates: `${lat.toFixed(2)}°N, ${lng.toFixed(2)}°E`,
+      lat,
+      lng,
+      condition: `Safe Navigation (${speed} kts)`,
+      metrics: {
+        seaTemp: `${telemetry.conditions?.sea_temperature ?? 28.4} °C`,
+        tempTrend: '↑ 0.1°C',
+        waveHeight: `${telemetry.conditions?.wave_height ?? 1.1} m`,
+        waveStatus: '• Calm',
+        windSpeed: `${telemetry.conditions?.wave_speed ?? 14} km/h`,
+        windStatus: '↓ ESE',
+        chlorophyll: `${telemetry.conditions?.chlorophyll ?? 2.4} mg/m³`,
+        chloroStatus: '• Optimal',
+      },
+      alerts: [
+        { id: 'a1', title: 'Clear Nav Channel', severity: 'Low Risk', type: 'advisory' },
+        { id: 'a2', title: 'AIS Telemetry Active', severity: 'Low Risk', type: 'advisory' },
+      ],
+    });
     setSheetVisible(true);
+    setZoomLevel(1.2);
   };
 
   const handleZoomIn = () => {
@@ -108,10 +210,48 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
 
           {/* Right: GPS Locked Status Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerRightActions}>
-            <View style={styles.statusPill}>
-              <Crosshair size={11} color="#00e5ff" />
-              <Text style={styles.statusText}>GPS Locked</Text>
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (telemetry.permissionStatus !== 'granted') {
+                  telemetry.requestGpsPermission();
+                } else {
+                  handleLocateMe();
+                }
+              }}
+              style={[
+                styles.statusPill,
+                telemetry.permissionStatus === 'denied' && styles.statusPillDenied,
+                telemetry.permissionStatus === 'requesting' && styles.statusPillPending,
+              ]}
+            >
+              <Crosshair
+                size={11}
+                color={
+                  telemetry.isGpsLocked
+                    ? '#00e5ff'
+                    : telemetry.permissionStatus === 'requesting'
+                    ? '#f59e0b'
+                    : '#8da2be'
+                }
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  telemetry.permissionStatus === 'denied' && styles.statusTextDenied,
+                  telemetry.permissionStatus === 'requesting' && styles.statusTextPending,
+                ]}
+              >
+                {telemetry.isGpsLocked
+                  ? 'GPS Locked'
+                  : telemetry.permissionStatus === 'requesting'
+                  ? 'Acquiring GPS...'
+                  : telemetry.permissionStatus === 'denied'
+                  ? 'GPS Off (Tap)'
+                  : 'Enable GPS'}
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               activeOpacity={0.8}
@@ -158,10 +298,13 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
             />
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setSearchModalVisible(true);
+              }}
               style={styles.filterButton}
             >
-              <SlidersHorizontal size={18} color="#8da2be" strokeWidth={1.8} />
+              <SlidersHorizontal size={18} color="#00e5ff" strokeWidth={1.8} />
             </TouchableOpacity>
           </View>
         </View>
@@ -183,6 +326,9 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
                 setSheetVisible(true);
               }}
               zoomLevel={zoomLevel}
+              userCoordinates={telemetry.coordinates}
+              speedKnots={telemetry.gpsState.speedKnots}
+              headingDeg={telemetry.gpsState.headingDeg}
             />
 
             {/* 4. Floating Map Controls (Left vertical & Right zoom/locate) */}
@@ -206,10 +352,52 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
             </View>
           )}
         </ScrollView>
+
+        {/* Global Location Search & Port Selector Modal */}
+        <LocationSearchModal
+          visible={searchModalVisible}
+          onClose={() => setSearchModalVisible(false)}
+          onSelectLocation={(coords, name, region) => {
+            telemetry.selectLocation(coords, name, region);
+            setSelectedLocation({
+              id: `loc-${name.toLowerCase().replace(/\s+/g, '-')}`,
+              type: 'pfz',
+              name,
+              region: region || 'Marine Sector',
+              coordinates: `${coords.latitude.toFixed(2)}°N, ${coords.longitude.toFixed(2)}°E`,
+              lat: coords.latitude,
+              lng: coords.longitude,
+              condition: 'Live Telemetry Synced',
+              metrics: {
+                seaTemp: `${telemetry.conditions?.sea_temperature ?? 28.4} °C`,
+                tempTrend: '↑ 0.2°C',
+                waveHeight: `${telemetry.conditions?.wave_height ?? 1.2} m`,
+                waveStatus: '• Stable',
+                windSpeed: `${telemetry.conditions?.wave_speed ?? 14} km/h`,
+                windStatus: '↓ Optimal',
+                chlorophyll: `${telemetry.conditions?.chlorophyll ?? 2.4} mg/m³`,
+                chloroStatus: '• High',
+              },
+              alerts: [
+                { id: 'a1', title: 'Open-Meteo Synced', severity: 'Low Risk', type: 'advisory' },
+              ],
+            });
+            setSheetVisible(true);
+            setZoomLevel(1.15);
+          }}
+          onResetToGps={() => {
+            telemetry.resetToGps();
+            handleLocateMe();
+          }}
+          currentCoords={telemetry.coordinates}
+          currentLocationName={telemetry.locationName}
+          isCustomLocation={telemetry.isCustomLocation}
+        />
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   rootContainer: {
@@ -248,11 +436,25 @@ const styles = StyleSheet.create({
     paddingVertical: 4.5,
     borderRadius: 20,
   },
+  statusPillDenied: {
+    backgroundColor: 'rgba(141, 162, 190, 0.08)',
+    borderColor: 'rgba(141, 162, 190, 0.25)',
+  },
+  statusPillPending: {
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderColor: 'rgba(245, 158, 11, 0.35)',
+  },
   statusText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 8.5,
     color: '#00e5ff',
     letterSpacing: 0.2,
+  },
+  statusTextDenied: {
+    color: '#8da2be',
+  },
+  statusTextPending: {
+    color: '#f59e0b',
   },
   headerIconButton: {
     width: 32,

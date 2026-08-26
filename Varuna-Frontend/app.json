@@ -11,14 +11,21 @@
       "resizeMode": "contain"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "VARUNA requires real-time GPS location for marine navigation, live weather telemetry, and Potential Fishing Zone tracking."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#02060e"
       },
       "package": "com.varuna.marineintelligence",
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "assetBundlePatterns": [
       "**/*"
@@ -41,7 +48,13 @@
           ]
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "VARUNA requires real-time GPS location for marine navigation, live weather telemetry, and Potential Fishing Zone tracking."
+        }
+      ]
     ]
   }
 }

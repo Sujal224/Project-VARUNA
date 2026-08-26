@@ -41,4 +41,11 @@ export const mapApi = {
       params: { lat, lng, radius_km: radiusKm },
     });
   },
+
+  async searchLocations(query: string = '', limit: number = 8): Promise<import('../../domain/models/location').LocationSearchResult[]> {
+    return apiClient.get<import('../../domain/models/location').LocationSearchResult[]>('/map/search-locations', {
+      params: { query, limit },
+    });
+  },
 };
+

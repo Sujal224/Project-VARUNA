@@ -33,9 +33,14 @@ import { ConditionMetricCard } from '../components/conditions/ConditionMetricCar
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
 import { QuickActionsRow } from '../components/common/QuickActionsRow';
 import { ShinyText } from '../components/common/ShinyText';
+
 import { ExplainableAiModal } from '../components/insights/ExplainableAiModal';
 import { telemetryService } from '../../data/services/telemetryService';
+import { useLiveTelemetry } from '../../data/hooks/useLiveTelemetry';
+import { LocationSearchModal } from '../components/common/LocationSearchModal';
+import { OceanMetric } from '../../domain/models/types';
 import { TabType } from '../components/navigation/BottomNavBar';
+
 
 interface HomeScreenProps {
   onNavigateTab: (tab: TabType) => void;
@@ -49,11 +54,71 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
 
+  const telemetry = useLiveTelemetry();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('pfz');
   const [explainModalVisible, setExplainModalVisible] = useState(false);
+  const [locationModalVisible, setLocationModalVisible] = useState(false);
 
-  const metrics = telemetryService.getMetrics();
+  const seaTemp = telemetry.conditions?.sea_temperature ?? 28.4;
+  const waveHeight = telemetry.conditions?.wave_height ?? 1.2;
+  const windSpeed = telemetry.conditions?.wave_speed ?? 14.0;
+  const currentSpeed = telemetry.conditions?.current_speed_knots ?? 1.4;
+  const chlorophyll = telemetry.conditions?.chlorophyll ?? 2.4;
+
+  const liveMetrics: OceanMetric[] = [
+    {
+      id: 'metric-sea-temp',
+      name: 'Sea Temp',
+      value: `${seaTemp}`,
+      unit: '°C',
+      delta: '↑ 0.3°C',
+      status: 'Optimal (28.4°C)',
+      trend: 'up',
+      icon: 'thermometer',
+      sparkline: [27.8, 28.0, 28.2, 28.1, 28.3, 28.4, seaTemp],
+      colorMode: 'cyan',
+    },
+    {
+      id: 'metric-wave-height',
+      name: 'Wave Height',
+      value: `${waveHeight}`,
+      unit: 'm',
+      delta: `${telemetry.conditions?.swell_period_sec ?? 9}s`,
+      status: waveHeight > 2.0 ? 'Elevated Swell' : 'Stable Swell',
+      trend: waveHeight > 2.0 ? 'up' : 'stable',
+      icon: 'waves',
+      sparkline: [0.9, 1.0, 1.1, 1.3, 1.2, 1.1, waveHeight],
+      colorMode: waveHeight > 2.0 ? 'amber' : 'cyan',
+    },
+    {
+      id: 'metric-wind-speed',
+      name: 'Wind Speed',
+      value: `${windSpeed}`,
+      unit: 'km/h',
+      delta: `${telemetry.conditions?.wind_direction_deg ?? 120}°`,
+      status: `Gusts ${telemetry.weather?.current?.wind_gust_kmh ?? 19} km/h`,
+      trend: windSpeed > 25 ? 'up' : 'down',
+      icon: 'wind',
+      sparkline: [12, 13, 15, 14, 16, 15, windSpeed],
+      colorMode: 'cyan',
+    },
+    {
+      id: 'metric-chlorophyll',
+      name: 'Pelagic Flow',
+      value: `${currentSpeed}`,
+      unit: 'kts',
+      delta: `${chlorophyll} mg/m³`,
+      status: 'High Productivity',
+      trend: 'up',
+      icon: 'science',
+      sparkline: [1.2, 1.3, 1.5, 1.4, 1.6, 1.5, currentSpeed],
+      colorMode: 'emerald',
+    },
+  ];
+
+
   const primaryInsight = telemetryService.getPrimaryInsight();
 
   const handleFilterPress = (filterId: string) => {
@@ -72,9 +137,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       onAskAi(searchQuery);
       setSearchQuery('');
     } else {
-      onNavigateTab('ai');
+      setLocationModalVisible(true);
     }
   };
+
 
   return (
     <View style={styles.rootContainer}>
@@ -299,11 +365,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => onNavigateTab('map')}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setLocationModalVisible(true);
+                }}
                 style={styles.locationSelector}
               >
-                <MapPin size={13} color="#8da2be" />
-                <Text style={styles.locationText}>Bay of Bengal</Text>
+                <MapPin size={13} color="#00e5ff" />
+                <Text style={styles.locationText} numberOfLines={1}>
+                  {telemetry.locationName || 'Bay of Bengal'}
+                </Text>
                 <ChevronRight size={14} color="#8da2be" />
               </TouchableOpacity>
             </View>
@@ -314,7 +385,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.metricsScroll}
             >
-              {metrics.map((metric) => (
+              {liveMetrics.map((metric) => (
                 <ConditionMetricCard key={metric.id} metric={metric} />
               ))}
             </ScrollView>
@@ -368,10 +439,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           insight={primaryInsight}
           onClose={() => setExplainModalVisible(false)}
         />
+
+        {/* Global Location Search & Port Selector Modal */}
+        <LocationSearchModal
+          visible={locationModalVisible}
+          onClose={() => setLocationModalVisible(false)}
+          onSelectLocation={(coords, name, region) => {
+            telemetry.selectLocation(coords, name, region);
+          }}
+          onResetToGps={() => {
+            telemetry.resetToGps();
+          }}
+          currentCoords={telemetry.coordinates}
+          currentLocationName={telemetry.locationName}
+          isCustomLocation={telemetry.isCustomLocation}
+        />
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   rootContainer: {
