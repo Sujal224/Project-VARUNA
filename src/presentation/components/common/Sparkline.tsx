@@ -12,10 +12,9 @@ interface SparklineProps {
 
 export const Sparkline: React.FC<SparklineProps> = ({
   data,
-  width = 80,
-  height = 24,
-  color = '#8aebff',
-  fillColor = 'rgba(34, 211, 238, 0.15)',
+  width = 140,
+  height = 36,
+  color = '#00e5ff',
 }) => {
   if (!data || data.length < 2) return null;
 
@@ -25,34 +24,39 @@ export const Sparkline: React.FC<SparklineProps> = ({
 
   const points = data.map((val, idx) => {
     const x = (idx / (data.length - 1)) * width;
-    const y = height - ((val - min) / range) * (height - 6) - 3;
+    const y = height - ((val - min) / range) * (height - 10) - 5;
     return { x, y };
   });
 
-  // Build SVG path
+  // Generate smooth bezier curve path
   let pathD = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    pathD += ` L ${points[i].x} ${points[i].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i];
+    const p1 = points[i + 1];
+    const cpX = (p0.x + p1.x) / 2;
+    pathD += ` C ${cpX} ${p0.y}, ${cpX} ${p1.y}, ${p1.x} ${p1.y}`;
   }
 
   const fillD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
+  const gradientId = `sparkGrad_${color.replace('#', '')}`;
 
   return (
     <View style={[styles.container, { width, height }]}>
       <Svg width={width} height={height}>
         <Defs>
-          <LinearGradient id="sparkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor={color} stopOpacity="0.25" />
+          <LinearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <Stop offset="0%" stopColor={color} stopOpacity="0.4" />
+            <Stop offset="70%" stopColor={color} stopOpacity="0.1" />
             <Stop offset="100%" stopColor={color} stopOpacity="0" />
           </LinearGradient>
         </Defs>
 
-        <Path d={fillD} fill="url(#sparkGradient)" />
+        <Path d={fillD} fill={`url(#${gradientId})`} />
         <Path
           d={pathD}
           fill="none"
           stroke={color}
-          strokeWidth="1.5"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -66,3 +70,4 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
+

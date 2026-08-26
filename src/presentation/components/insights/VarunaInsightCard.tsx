@@ -5,7 +5,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { VarunaInsight } from '../../../domain/models/types';
 import { Colors } from '../../../theme/colors';
-import { Typography } from '../../../theme/typography';
 import { ConfidenceRing } from '../common/ConfidenceRing';
 
 interface VarunaInsightCardProps {
@@ -31,9 +30,11 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Radial soft background illumination */}
+      {/* Ambient Blue/Indigo Glow in Top Corner */}
       <LinearGradient
-        colors={['rgba(49, 49, 192, 0.15)', 'transparent']}
+        colors={['rgba(37, 99, 235, 0.18)', 'rgba(0, 229, 255, 0.06)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.8, y: 0.8 }}
         style={styles.ambientGlow}
       />
 
@@ -42,10 +43,10 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
         <View style={styles.textSection}>
           {/* Header Badge */}
           <View style={styles.badgeRow}>
-            <Sparkles size={18} color={Colors.secondary} />
+            <Sparkles size={16} color="#38bdf8" />
             <Text style={styles.badgeTitle}>VARUNA Insight</Text>
             <View style={styles.timeTag}>
-              <Text style={styles.timeTagText}>{insight.timestamp}</Text>
+              <Text style={styles.timeTagText}>{insight.timestamp || 'Just now'}</Text>
             </View>
           </View>
 
@@ -55,38 +56,31 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
           {/* Supporting Rationale */}
           <Text style={styles.explanationText}>{insight.explanation}</Text>
 
-          {/* Action Buttons */}
+          {/* Action Buttons Row */}
           <View style={styles.actionsRow}>
             <TouchableOpacity
-              activeOpacity={0.8}
+              activeOpacity={0.85}
               onPress={handlePfzPress}
-              style={styles.primaryButtonWrapper}
+              style={styles.primaryButton}
             >
-              <LinearGradient
-                colors={['#3131c0', '#2563eb']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.primaryButton}
-              >
-                <Text style={styles.primaryButtonText}>View PFZ Map</Text>
-                <ArrowRight size={14} color="#ffffff" />
-              </LinearGradient>
+              <Text style={styles.primaryButtonText}>View PFZ Map</Text>
+              <ArrowRight size={14} color="#ffffff" />
             </TouchableOpacity>
 
             <TouchableOpacity
-              activeOpacity={0.8}
+              activeOpacity={0.85}
               onPress={handleExplainPress}
               style={styles.secondaryButton}
             >
-              <Star size={13} color={Colors.secondary} />
-              <Text style={styles.secondaryButtonText}>Why this?</Text>
+              <Star size={12} color="#38bdf8" fill="#38bdf8" />
+              <Text style={styles.secondaryButtonText}>Why this recommendation?</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Right Side: Confidence Ring */}
         <View style={styles.ringSection}>
-          <ConfidenceRing percent={insight.confidencePercent} size={96} strokeWidth={5} />
+          <ConfidenceRing percent={insight.confidencePercent} size={92} strokeWidth={6} />
         </View>
       </View>
     </View>
@@ -95,31 +89,26 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(28, 43, 60, 0.5)',
+    backgroundColor: 'rgba(8, 20, 36, 0.65)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
-    padding: 18,
+    padding: 16,
     position: 'relative',
     overflow: 'hidden',
-    shadowColor: '#22d3ee',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
   },
   ambientGlow: {
     position: 'absolute',
-    top: -50,
-    left: -50,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    top: 0,
+    left: 0,
+    width: 220,
+    height: 180,
   },
   contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 10,
   },
   textSection: {
     flex: 1,
@@ -131,36 +120,35 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   badgeTitle: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
     lineHeight: 16,
     color: '#ffffff',
   },
   timeTag: {
-    backgroundColor: 'rgba(18, 33, 49, 0.8)',
-    paddingHorizontal: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 7,
     paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 4,
+    borderRadius: 9999,
+    marginLeft: 2,
   },
   timeTagText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 9,
-    lineHeight: 11,
-    color: Colors.onSurfaceVariant,
+    fontSize: 10,
+    lineHeight: 12,
+    color: '#94a3b8',
   },
   headlineText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 15,
-    lineHeight: 21,
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    lineHeight: 18,
     color: '#ffffff',
   },
   explanationText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    lineHeight: 17,
-    color: Colors.onSurfaceVariant,
-    opacity: 0.85,
+    fontSize: 11,
+    lineHeight: 15,
+    color: '#8da2be',
   },
   actionsRow: {
     flexDirection: 'row',
@@ -169,17 +157,18 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 4,
   },
-  primaryButtonWrapper: {
-    borderRadius: 9999,
-    overflow: 'hidden',
-  },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    backgroundColor: '#1d4ed8',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 9999,
+    shadowColor: '#1d4ed8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
   },
   primaryButtonText: {
     fontFamily: 'Inter_600SemiBold',
@@ -191,21 +180,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(18, 33, 49, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 9999,
   },
   secondaryButtonText: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_400Regular',
     fontSize: 11,
     lineHeight: 14,
-    color: Colors.onSurface,
+    color: '#cbd5e1',
   },
   ringSection: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingLeft: 4,
   },
 });
+

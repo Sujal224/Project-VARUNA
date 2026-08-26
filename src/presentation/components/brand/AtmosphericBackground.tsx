@@ -1,67 +1,47 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Defs, RadialGradient as SvgRadialGradient, Stop } from 'react-native-svg';
-import { Colors } from '../../../theme/colors';
+import Svg, { Circle, Defs, RadialGradient as SvgRadialGradient, Stop } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 
 export const AtmosphericBackground: React.FC = () => {
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      {/* Base Radial/Vertical Oceanic Gradient */}
+      {/* Base Oceanic Void Gradient */}
       <LinearGradient
-        colors={['#102438', '#071526', '#020a14', '#01070e']}
+        colors={['#061120', '#030a16', '#02060e', '#01040a']}
         locations={[0, 0.35, 0.7, 1]}
         style={StyleSheet.absoluteFillObject}
       />
 
-      {/* Top Ambient Glow Cone */}
-      <LinearGradient
-        colors={['rgba(34, 211, 238, 0.08)', 'rgba(99, 102, 241, 0.04)', 'transparent']}
-        style={[styles.glowCone, { width, height: 450 }]}
-      />
-
-      {/* Topographical Bathymetry / Sonar Contour Lines */}
-      <View style={styles.svgOverlay}>
-        <Svg width={width} height={500} viewBox="0 0 400 500">
+      {/* Radiant Horizon Glow (Behind the boat / bathymetry visualizer) */}
+      <View style={styles.horizonGlowContainer}>
+        <Svg width={width} height={350} viewBox="0 0 400 350">
           <Defs>
-            <SvgRadialGradient id="sonarGlow" cx="50%" cy="20%" r="60%">
-              <Stop offset="0%" stopColor="#22d3ee" stopOpacity="0.25" />
-              <Stop offset="50%" stopColor="#6366f1" stopOpacity="0.1" />
-              <Stop offset="100%" stopColor="#051424" stopOpacity="0" />
+            <SvgRadialGradient id="horizonBurst" cx="75%" cy="35%" r="65%">
+              <Stop offset="0%" stopColor="#8aebff" stopOpacity="0.32" />
+              <Stop offset="25%" stopColor="#00e5ff" stopOpacity="0.18" />
+              <Stop offset="60%" stopColor="#1e40af" stopOpacity="0.08" />
+              <Stop offset="100%" stopColor="#02060e" stopOpacity="0" />
+            </SvgRadialGradient>
+            <SvgRadialGradient id="upperGlow" cx="20%" cy="10%" r="50%">
+              <Stop offset="0%" stopColor="#00e5ff" stopOpacity="0.12" />
+              <Stop offset="100%" stopColor="#02060e" stopOpacity="0" />
             </SvgRadialGradient>
           </Defs>
 
-          {/* Contour Curves */}
-          <Path
-            d="M -50 120 C 80 180, 220 80, 450 160"
-            fill="none"
-            stroke="rgba(138, 235, 255, 0.12)"
-            strokeWidth="1"
-            strokeDasharray="4 6"
-          />
-          <Path
-            d="M -50 180 C 100 240, 260 140, 450 210"
-            fill="none"
-            stroke="rgba(138, 235, 255, 0.08)"
-            strokeWidth="1"
-          />
-          <Path
-            d="M -50 250 C 120 310, 280 200, 450 280"
-            fill="none"
-            stroke="rgba(99, 102, 241, 0.09)"
-            strokeWidth="1"
-          />
-          <Path
-            d="M -50 330 C 140 380, 300 290, 450 360"
-            fill="none"
-            stroke="rgba(138, 235, 255, 0.06)"
-            strokeWidth="1"
-            strokeDasharray="2 4"
-          />
+          {/* Horizon Sunburst / Light Source */}
+          <Circle cx="300" cy="120" r="180" fill="url(#horizonBurst)" />
+          <Circle cx="60" cy="40" r="140" fill="url(#upperGlow)" />
         </Svg>
       </View>
+
+      {/* Top subtle blue ambient cone */}
+      <LinearGradient
+        colors={['rgba(0, 229, 255, 0.05)', 'rgba(37, 99, 235, 0.03)', 'transparent']}
+        style={[styles.glowCone, { width, height: 400 }]}
+      />
     </View>
   );
 };
@@ -72,10 +52,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-  svgOverlay: {
+  horizonGlowContainer: {
     position: 'absolute',
-    top: 0,
+    top: 140,
     left: 0,
-    opacity: 0.8,
+    right: 0,
   },
 });
+

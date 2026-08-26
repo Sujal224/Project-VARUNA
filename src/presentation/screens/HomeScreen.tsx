@@ -11,33 +11,33 @@ import {
   Image,
 } from 'react-native';
 import {
-  Radio,
   Bell,
   AudioWaveform as Waveform,
   Fish,
-  Cloud,
+  CloudSun,
   Waves,
   Navigation,
   AlertTriangle,
   MapPin,
   ChevronRight,
-  HardDrive,
+  Database,
+  Download,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
-import { Typography } from '../../theme/typography';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
+import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
+import { QuickActionsRow } from '../components/common/QuickActionsRow';
 import { ExplainableAiModal } from '../components/insights/ExplainableAiModal';
-import { MarineMapPreview } from '../components/map/MarineMapPreview';
 import { telemetryService } from '../../data/services/telemetryService';
 import { TabType } from '../components/navigation/BottomNavBar';
 
 interface HomeScreenProps {
   onNavigateTab: (tab: TabType) => void;
-  onAskAi: (query: string) => void;
+  onAskAi: (query?: string) => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -50,14 +50,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const metrics = telemetryService.getMetrics();
   const primaryInsight = telemetryService.getPrimaryInsight();
-  const pfzZone = telemetryService.getPfzZones()[0];
-  const vessel = telemetryService.getVessel();
-  const offlineStatus = telemetryService.getOfflineStatus();
 
   const handleFilterPress = (filterId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedFilter(filterId);
-    if (filterId === 'map' || filterId === 'pfz' || filterId === 'safe_route') {
+    if (filterId === 'pfz' || filterId === 'safe_route') {
       onNavigateTab('map');
     } else if (filterId === 'alerts') {
       onNavigateTab('alerts');
@@ -69,30 +66,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       onAskAi(searchQuery);
       setSearchQuery('');
+    } else {
+      onNavigateTab('ai');
     }
   };
 
   return (
     <View style={styles.rootContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#051424" translucent />
+      <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
       <SafeAreaView style={styles.safeArea}>
         {/* Top App Header */}
         <View style={styles.topHeader}>
-          {/* Brand Identity & Status */}
+          {/* Left: Brand Identity with Glowing Varuna Orb */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={36} />
+            <VarunaOrb size={38} />
             <View style={styles.brandTitleContainer}>
               <Text style={styles.brandName}>VARUNA</Text>
               <Text style={styles.brandTagline}>MARINE INTELLIGENCE</Text>
             </View>
           </View>
 
-          {/* Right Header Actions: Offline Ready, Bell, Captain Avatar */}
+          {/* Right: Offline Ready Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerActions}>
             <View style={styles.offlineReadyPill}>
-              <Radio size={13} color={Colors.primary} />
+              <Waveform size={14} color="#00e676" />
               <Text style={styles.offlineReadyText}>Offline Ready</Text>
             </View>
 
@@ -101,7 +100,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               onPress={() => onNavigateTab('alerts')}
               style={styles.headerIconButton}
             >
-              <Bell size={18} color={Colors.onSurface} />
+              <Bell size={18} color="#e2edfd" />
               <View style={styles.notificationDot} />
             </TouchableOpacity>
 
@@ -133,15 +132,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Text style={styles.heroSubtext}>Your AI partner for the ocean.</Text>
           </View>
 
-          {/* AI Search / Voice Interaction Gateway */}
+          {/* AI Search / Prompt Capsule */}
           <View style={styles.searchGateway}>
             <View style={styles.searchOrbWrapper}>
-              <VarunaOrb size={38} />
+              <VarunaOrb size={34} />
             </View>
             <TextInput
               style={styles.searchInput}
               placeholder="Ask VARUNA anything..."
-              placeholderTextColor={Colors.onSurfaceVariant}
+              placeholderTextColor="#8da2be"
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearchSubmit}
@@ -152,11 +151,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               onPress={() => onNavigateTab('ai')}
               style={styles.micButton}
             >
-              <Waveform size={22} color={Colors.primary} />
+              <Waveform size={20} color="#38bdf8" />
             </TouchableOpacity>
           </View>
 
-          {/* Quick Intelligence Filters */}
+          {/* Quick Intelligence Filter Chips */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -170,7 +169,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 selectedFilter === 'pfz' && styles.filterPillActive,
               ]}
             >
-              <Fish size={15} color={selectedFilter === 'pfz' ? Colors.primary : Colors.onSurfaceVariant} />
+              <Fish
+                size={14}
+                color={selectedFilter === 'pfz' ? '#00e5ff' : '#8da2be'}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -189,7 +191,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 selectedFilter === 'weather' && styles.filterPillActive,
               ]}
             >
-              <Cloud size={15} color={selectedFilter === 'weather' ? Colors.primary : Colors.onSurfaceVariant} />
+              <CloudSun
+                size={14}
+                color={selectedFilter === 'weather' ? '#00e5ff' : '#8da2be'}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -208,7 +213,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 selectedFilter === 'tides' && styles.filterPillActive,
               ]}
             >
-              <Waves size={15} color={selectedFilter === 'tides' ? Colors.primary : Colors.onSurfaceVariant} />
+              <Waves
+                size={14}
+                color={selectedFilter === 'tides' ? '#00e5ff' : '#8da2be'}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -227,7 +235,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 selectedFilter === 'safe_route' && styles.filterPillActive,
               ]}
             >
-              <Navigation size={15} color={selectedFilter === 'safe_route' ? Colors.primary : Colors.onSurfaceVariant} />
+              <Navigation
+                size={14}
+                color={selectedFilter === 'safe_route' ? '#00e5ff' : '#8da2be'}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -246,7 +257,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 selectedFilter === 'alerts' && styles.filterPillActive,
               ]}
             >
-              <AlertTriangle size={15} color={selectedFilter === 'alerts' ? Colors.primary : Colors.onSurfaceVariant} />
+              <AlertTriangle
+                size={14}
+                color={selectedFilter === 'alerts' ? '#00e5ff' : '#8da2be'}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -257,6 +271,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </Text>
             </TouchableOpacity>
           </ScrollView>
+
+          {/* Center Ocean Bathymetry & Radar Visualizer */}
+          <OceanRadarVisualizer
+            onPressPfz={() => onNavigateTab('map')}
+            onPressCyclone={() => onNavigateTab('alerts')}
+          />
 
           {/* Real-Time Conditions 4-Metric Grid */}
           <View style={styles.conditionsSection}>
@@ -274,9 +294,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 onPress={() => onNavigateTab('map')}
                 style={styles.locationSelector}
               >
-                <MapPin size={13} color={Colors.primary} />
+                <MapPin size={13} color="#8da2be" />
                 <Text style={styles.locationText}>Bay of Bengal</Text>
-                <ChevronRight size={14} color={Colors.onSurfaceVariant} />
+                <ChevronRight size={14} color="#8da2be" />
               </TouchableOpacity>
             </View>
 
@@ -289,43 +309,44 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
           </View>
 
-          {/* VARUNA Insight Component */}
+          {/* VARUNA AI Insight Card */}
           <VarunaInsightCard
             insight={primaryInsight}
             onViewPfzMap={() => onNavigateTab('map')}
             onExplain={() => setExplainModalVisible(true)}
           />
 
-          {/* Interactive Geospatial Map Preview */}
-          <View style={styles.mapSection}>
-            <View style={styles.sectionTitleRow}>
-              <Text style={styles.sectionTitle}>Marine Intelligence Grid</Text>
-              <Text style={styles.sectorText}>Sector Alpha • Active</Text>
-            </View>
-            <MarineMapPreview
-              zone={pfzZone}
-              vessel={vessel}
-              onExpandMap={() => onNavigateTab('map')}
-            />
-          </View>
+          {/* Quick Actions Row */}
+          <QuickActionsRow
+            onSelectAction={(_id, tab) => tab && onNavigateTab(tab)}
+            onSeeAll={() => onNavigateTab('map')}
+          />
 
-          {/* Offline Intelligence Banner */}
+          {/* Offline Ready Module */}
           <View style={styles.offlineCard}>
             <View style={styles.offlineCardLeft}>
-              <HardDrive size={18} color={Colors.primary} />
-              <View>
-                <Text style={styles.offlineCardTitle}>Offline Ready Cache</Text>
+              <View style={styles.offlineIconCircle}>
+                <Database size={18} color="#00e5ff" />
+              </View>
+              <View style={styles.offlineTextGroup}>
+                <View style={styles.offlineTitleRow}>
+                  <Text style={styles.offlineCardTitle}>Offline Ready</Text>
+                  <View style={styles.betaTag}>
+                    <Text style={styles.betaTagText}>BETA</Text>
+                  </View>
+                </View>
                 <Text style={styles.offlineCardSubtitle}>
-                  {offlineStatus.cachedSectorsCount} sectors & bathymetry tiles synced ({Math.round(offlineStatus.cacheSizeBytes / (1024 * 1024))} MB)
+                  Core features work without internet using cached data.
                 </Text>
               </View>
             </View>
             <TouchableOpacity
-              activeOpacity={0.8}
+              activeOpacity={0.85}
               onPress={() => onNavigateTab('profile')}
               style={styles.manageDataButton}
             >
-              <Text style={styles.manageDataText}>Manage</Text>
+              <Download size={13} color="#ffffff" />
+              <Text style={styles.manageDataText}>Manage Data</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -344,7 +365,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
   },
   safeArea: {
     flex: 1,
@@ -363,7 +384,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   brandTitleContainer: {
-    gap: 1,
+    gap: 2,
   },
   brandName: {
     fontFamily: 'Inter_600SemiBold',
@@ -374,10 +395,10 @@ const styles = StyleSheet.create({
   },
   brandTagline: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 8,
-    lineHeight: 10,
+    fontSize: 7.5,
+    lineHeight: 9,
     letterSpacing: 1.2,
-    color: Colors.onSurfaceVariant,
+    color: '#8da2be',
     opacity: 0.8,
   },
   headerActions: {
@@ -389,23 +410,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(34, 211, 238, 0.08)',
+    backgroundColor: 'rgba(0, 230, 118, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.25)',
-    paddingHorizontal: 9,
+    borderColor: 'rgba(0, 230, 118, 0.25)',
+    paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 9999,
   },
   offlineReadyText: {
     fontFamily: 'Inter_500Medium',
     fontSize: 10,
-    color: Colors.primary,
+    color: '#00e676',
   },
   headerIconButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(28, 43, 60, 0.5)',
+    backgroundColor: 'rgba(10, 23, 40, 0.65)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
@@ -416,10 +437,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 7,
     right: 8,
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: Colors.primary,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#00e5ff',
   },
   avatarButton: {
     width: 36,
@@ -438,13 +459,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 14,
     paddingBottom: 110,
-    gap: 22,
+    gap: 20,
   },
   heroSection: {
-    gap: 4,
-    marginTop: 6,
+    gap: 6,
+    marginTop: 4,
   },
   heroHeadline: {
     fontFamily: 'PlayfairDisplay_600SemiBold',
@@ -455,14 +476,14 @@ const styles = StyleSheet.create({
   },
   heroSubtext: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 15,
-    lineHeight: 20,
-    color: Colors.onSurfaceVariant,
+    fontSize: 14,
+    lineHeight: 18,
+    color: '#8da2be',
   },
   searchGateway: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(28, 43, 60, 0.5)',
+    backgroundColor: 'rgba(8, 20, 36, 0.65)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 9999,
@@ -495,33 +516,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(28, 43, 60, 0.5)',
+    backgroundColor: 'rgba(8, 20, 36, 0.6)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 9999,
   },
   filterPillActive: {
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
-    borderColor: 'rgba(34, 211, 238, 0.4)',
+    backgroundColor: 'rgba(0, 229, 255, 0.12)',
+    borderColor: 'rgba(0, 229, 255, 0.4)',
   },
   filterText: {
     fontFamily: 'Inter_500Medium',
     fontSize: 12,
-    color: Colors.onSurfaceVariant,
+    color: '#8da2be',
   },
   filterTextActive: {
-    color: Colors.primary,
+    color: '#00e5ff',
     fontFamily: 'Inter_600SemiBold',
   },
   conditionsSection: {
-    backgroundColor: 'rgba(18, 33, 49, 0.45)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 20,
-    padding: 16,
-    gap: 14,
+    gap: 12,
   },
   conditionsHeader: {
     flexDirection: 'row',
@@ -536,13 +552,14 @@ const styles = StyleSheet.create({
   conditionsTitle: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
+    lineHeight: 18,
     color: '#ffffff',
   },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 9999,
@@ -551,13 +568,13 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#00e676',
   },
   liveText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 9,
     textTransform: 'uppercase',
-    color: Colors.primary,
+    color: '#00e676',
     letterSpacing: 0.6,
   },
   locationSelector: {
@@ -566,9 +583,9 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   locationText: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_400Regular',
     fontSize: 11,
-    color: Colors.onSurfaceVariant,
+    color: '#8da2be',
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -579,32 +596,14 @@ const styles = StyleSheet.create({
   metricGridItem: {
     width: '48%',
   },
-  mapSection: {
-    gap: 10,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    color: '#ffffff',
-  },
-  sectorText: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: Colors.onSurfaceVariant,
-  },
   offlineCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(28, 43, 60, 0.4)',
+    backgroundColor: 'rgba(8, 20, 36, 0.65)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 14,
   },
   offlineCardLeft: {
@@ -613,26 +612,59 @@ const styles = StyleSheet.create({
     gap: 10,
     flex: 1,
   },
+  offlineIconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0, 229, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  offlineTextGroup: {
+    flex: 1,
+    gap: 2,
+  },
+  offlineTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   offlineCardTitle: {
     fontFamily: 'Inter_500Medium',
     fontSize: 12,
-    color: '#ffffff',
+    lineHeight: 15,
+    color: '#00e676',
+  },
+  betaTag: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  betaTagText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 8,
+    color: '#8da2be',
   },
   offlineCardSubtitle: {
     fontFamily: 'Inter_400Regular',
     fontSize: 10,
-    color: Colors.onSurfaceVariant,
-    marginTop: 1,
+    lineHeight: 13,
+    color: '#8da2be',
   },
   manageDataButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#1d4ed8',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 9999,
   },
   manageDataText: {
     fontFamily: 'Inter_500Medium',
     fontSize: 11,
-    color: Colors.primary,
+    color: '#ffffff',
   },
 });
+

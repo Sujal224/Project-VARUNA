@@ -11,8 +11,8 @@ interface ConfidenceRingProps {
 
 export const ConfidenceRing: React.FC<ConfidenceRingProps> = ({
   percent,
-  size = 110,
-  strokeWidth = 6,
+  size = 100,
+  strokeWidth = 6.5,
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -23,8 +23,9 @@ export const ConfidenceRing: React.FC<ConfidenceRingProps> = ({
       <Svg width={size} height={size} style={styles.svg}>
         <Defs>
           <LinearGradient id="cyanRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#22d3ee" />
-            <Stop offset="100%" stopColor="#8aebff" />
+            <Stop offset="0%" stopColor="#00e5ff" />
+            <Stop offset="50%" stopColor="#38bdf8" />
+            <Stop offset="100%" stopColor="#2563eb" />
           </LinearGradient>
         </Defs>
 
@@ -38,7 +39,7 @@ export const ConfidenceRing: React.FC<ConfidenceRingProps> = ({
           fill="none"
         />
 
-        {/* Animated Glowing Progress Ring */}
+        {/* Glowing Progress Ring */}
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -83,25 +84,26 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   percentNumber: {
-    fontFamily: 'Inter_400Regular',
-    fontSize: 26,
-    lineHeight: 28,
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 22,
+    lineHeight: 26,
     color: '#ffffff',
+    letterSpacing: -0.5,
   },
   percentSign: {
-    fontFamily: 'Inter_400Regular',
+    fontFamily: 'Inter_500Medium',
     fontSize: 13,
     lineHeight: 18,
-    color: Colors.onSurfaceVariant,
+    color: '#94a3b8',
     marginLeft: 1,
-  },
-  label: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 8,
-    lineHeight: 10,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    color: Colors.onSurfaceVariant,
     marginTop: 2,
   },
+  label: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 9,
+    lineHeight: 11,
+    color: '#94a3b8',
+    marginTop: 1,
+  },
 });
+

@@ -71,7 +71,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#051424" translucent />
+      <StatusBar style="light" backgroundColor="#02060e" translucent />
       
       {/* Screen Content View */}
       <View style={styles.screenWrapper}>{renderCurrentScreen()}</View>
@@ -88,11 +88,11 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -100,3 +100,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+

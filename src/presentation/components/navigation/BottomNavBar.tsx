@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Home, Map, Bell, User } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { Colors } from '../../../theme/colors';
 import { VarunaOrb } from '../brand/VarunaOrb';
+
+const { width } = Dimensions.get('window');
 
 export type TabType = 'home' | 'map' | 'ai' | 'alerts' | 'profile';
 
@@ -24,7 +26,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 
   return (
     <View style={styles.outerContainer}>
-      <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFillObject} />
+      <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFillObject} />
 
       <View style={styles.navBar}>
         {/* Tab 1: Home */}
@@ -34,8 +36,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           style={styles.tabItem}
         >
           <Home
-            size={20}
-            color={currentTab === 'home' ? Colors.primary : Colors.onSurfaceVariant}
+            size={22}
+            color={currentTab === 'home' ? '#38bdf8' : '#8da2be'}
           />
           <Text
             style={[
@@ -45,7 +47,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           >
             Home
           </Text>
-          {currentTab === 'home' && <View style={styles.activeDot} />}
         </TouchableOpacity>
 
         {/* Tab 2: Map */}
@@ -55,8 +56,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           style={styles.tabItem}
         >
           <Map
-            size={20}
-            color={currentTab === 'map' ? Colors.primary : Colors.onSurfaceVariant}
+            size={22}
+            color={currentTab === 'map' ? '#38bdf8' : '#8da2be'}
           />
           <Text
             style={[
@@ -66,17 +67,16 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           >
             Map
           </Text>
-          {currentTab === 'map' && <View style={styles.activeDot} />}
         </TouchableOpacity>
 
-        {/* Central Signature VARUNA Orb Action */}
+        {/* Center Raised Signature VARUNA Orb */}
         <View style={styles.centerOrbWrapper}>
           <TouchableOpacity
             activeOpacity={0.9}
             onPress={() => handleTabPress('ai')}
             style={styles.centerOrbButton}
           >
-            <VarunaOrb size={46} active={currentTab === 'ai'} />
+            <VarunaOrb size={52} active={currentTab === 'ai'} />
           </TouchableOpacity>
         </View>
 
@@ -88,8 +88,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
         >
           <View style={styles.alertIconContainer}>
             <Bell
-              size={20}
-              color={currentTab === 'alerts' ? Colors.primary : Colors.onSurfaceVariant}
+              size={22}
+              color={currentTab === 'alerts' ? '#38bdf8' : '#8da2be'}
             />
             <View style={styles.alertNotificationDot} />
           </View>
@@ -101,7 +101,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           >
             Alerts
           </Text>
-          {currentTab === 'alerts' && <View style={styles.activeDot} />}
         </TouchableOpacity>
 
         {/* Tab 5: Profile */}
@@ -111,8 +110,8 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           style={styles.tabItem}
         >
           <User
-            size={20}
-            color={currentTab === 'profile' ? Colors.primary : Colors.onSurfaceVariant}
+            size={22}
+            color={currentTab === 'profile' ? '#38bdf8' : '#8da2be'}
           />
           <Text
             style={[
@@ -122,8 +121,12 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           >
             Profile
           </Text>
-          {currentTab === 'profile' && <View style={styles.activeDot} />}
         </TouchableOpacity>
+      </View>
+
+      {/* iOS Home Indicator Bar */}
+      <View style={styles.homeIndicatorWrapper}>
+        <View style={styles.homeIndicator} />
       </View>
     </View>
   );
@@ -135,11 +138,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(5, 20, 36, 0.75)',
+    backgroundColor: 'rgba(3, 9, 18, 0.82)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    paddingBottom: 20,
     paddingTop: 8,
+    paddingBottom: 6,
   },
   navBar: {
     flexDirection: 'row',
@@ -151,50 +154,40 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 4,
     paddingHorizontal: 10,
     minWidth: 54,
+    gap: 4,
   },
   tabLabel: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_400Regular',
     fontSize: 10,
-    color: Colors.onSurfaceVariant,
-    marginTop: 4,
+    lineHeight: 12,
+    color: '#8da2be',
   },
   tabLabelActive: {
-    color: Colors.primary,
-    fontFamily: 'Inter_600SemiBold',
-  },
-  activeDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.primary,
-    marginTop: 2,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    color: '#38bdf8',
+    fontFamily: 'Inter_500Medium',
   },
   centerOrbWrapper: {
-    top: -18,
+    top: -14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   centerOrbButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(5, 20, 36, 0.9)',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(3, 9, 18, 0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
-    shadowColor: '#22d3ee',
+    borderWidth: 1.5,
+    borderColor: 'rgba(0, 229, 255, 0.45)',
+    shadowColor: '#00e5ff',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 10,
   },
   alertIconContainer: {
     position: 'relative',
@@ -202,12 +195,26 @@ const styles = StyleSheet.create({
   alertNotificationDot: {
     position: 'absolute',
     top: -1,
-    right: -2,
+    right: -1,
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#00e5ff',
     borderWidth: 1,
-    borderColor: '#051424',
+    borderColor: '#040b15',
+  },
+  homeIndicatorWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 6,
+    paddingBottom: 2,
+  },
+  homeIndicator: {
+    width: 134,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#ffffff',
+    opacity: 0.6,
   },
 });
+
