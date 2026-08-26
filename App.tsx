@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import {
@@ -22,7 +22,7 @@ import { AlertsScreen } from './src/presentation/screens/AlertsScreen';
 import { ProfileScreen } from './src/presentation/screens/ProfileScreen';
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -32,12 +32,21 @@ export default function App() {
     PlayfairDisplay_700Bold,
   });
 
+  const [timedOut, setTimedOut] = useState(false);
   const [currentTab, setCurrentTab] = useState<TabType>('home');
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    // Safety fallback: Proceed after 1.5s even if font loading is delayed
+    const timer = setTimeout(() => {
+      setTimedOut(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!fontsLoaded && !fontError && !timedOut) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
+        <ActivityIndicator size="large" color="#00e5ff" />
       </View>
     );
   }
