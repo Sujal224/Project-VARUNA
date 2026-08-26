@@ -79,9 +79,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <SafeAreaView style={styles.safeArea}>
         {/* Top App Header */}
         <View style={styles.topHeader}>
-          {/* Left: Brand Identity with Glowing Varuna Orb */}
+          {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={38} />
+            <VarunaOrb size={42} />
             <View style={styles.brandTitleContainer}>
               <Text style={styles.brandName}>VARUNA</Text>
               <Text style={styles.brandTagline}>MARINE INTELLIGENCE</Text>
@@ -132,10 +132,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Text style={styles.heroSubtext}>Your AI partner for the ocean.</Text>
           </View>
 
-          {/* AI Search / Prompt Capsule */}
+          {/* AI Search / Prompt Capsule (Liquid Glass Style) */}
           <View style={styles.searchGateway}>
             <View style={styles.searchOrbWrapper}>
-              <VarunaOrb size={34} />
+              <VarunaOrb size={40} />
             </View>
             <TextInput
               style={styles.searchInput}
@@ -278,7 +278,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             onPressCyclone={() => onNavigateTab('alerts')}
           />
 
-          {/* Real-Time Conditions 4-Metric Grid */}
+          {/* Real-Time Conditions Master Liquid Glass Container */}
           <View style={styles.conditionsSection}>
             <View style={styles.conditionsHeader}>
               <View style={styles.conditionsTitleRow}>
@@ -300,6 +300,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </TouchableOpacity>
             </View>
 
+            {/* 2x2 Metric Cards Grid */}
             <View style={styles.metricsGrid}>
               {metrics.map((metric) => (
                 <View key={metric.id} style={styles.metricGridItem}>
@@ -388,18 +389,18 @@ const styles = StyleSheet.create({
   },
   brandName: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    lineHeight: 16,
-    letterSpacing: 2,
+    fontSize: 15,
+    lineHeight: 17,
+    letterSpacing: 2.5,
     color: '#ffffff',
   },
   brandTagline: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 7.5,
-    lineHeight: 9,
-    letterSpacing: 1.2,
+    fontSize: 8,
+    lineHeight: 10,
+    letterSpacing: 1.4,
     color: '#8da2be',
-    opacity: 0.8,
+    opacity: 0.85,
   },
   headerActions: {
     flexDirection: 'row',
@@ -426,9 +427,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(10, 23, 40, 0.65)',
+    backgroundColor: 'rgba(8, 20, 38, 0.72)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -446,8 +447,8 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     overflow: 'hidden',
   },
   avatarImage: {
@@ -458,7 +459,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingTop: 14,
     paddingBottom: 110,
     gap: 20,
@@ -483,13 +484,19 @@ const styles = StyleSheet.create({
   searchGateway: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(8, 20, 36, 0.65)',
+    backgroundColor: 'rgba(8, 20, 38, 0.72)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 9999,
     paddingVertical: 5,
     paddingHorizontal: 6,
     position: 'relative',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   searchOrbWrapper: {
     marginRight: 6,
@@ -516,16 +523,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(8, 20, 36, 0.6)',
+    backgroundColor: 'rgba(8, 20, 38, 0.65)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopColor: 'rgba(255, 255, 255, 0.14)',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 9999,
   },
   filterPillActive: {
     backgroundColor: 'rgba(0, 229, 255, 0.12)',
-    borderColor: 'rgba(0, 229, 255, 0.4)',
+    borderColor: 'rgba(0, 229, 255, 0.45)',
+    borderTopColor: 'rgba(0, 229, 255, 0.6)',
   },
   filterText: {
     fontFamily: 'Inter_500Medium',
@@ -537,7 +546,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   conditionsSection: {
-    gap: 12,
+    backgroundColor: 'rgba(6, 18, 38, 0.72)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopColor: 'rgba(255, 255, 255, 0.18)',
+    borderRadius: 22,
+    padding: 16,
+    gap: 14,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 5,
   },
   conditionsHeader: {
     flexDirection: 'row',
@@ -551,8 +571,8 @@ const styles = StyleSheet.create({
   },
   conditionsTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 19,
     color: '#ffffff',
   },
   liveBadge: {
@@ -560,8 +580,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     backgroundColor: 'rgba(0, 230, 118, 0.12)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 230, 118, 0.25)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
     borderRadius: 9999,
   },
   liveDot: {
@@ -584,7 +606,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
+    fontSize: 12,
     color: '#8da2be',
   },
   metricsGrid: {
@@ -600,11 +622,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(8, 20, 36, 0.65)',
+    backgroundColor: 'rgba(8, 20, 38, 0.72)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 18,
-    padding: 14,
+    borderTopColor: 'rgba(255, 255, 255, 0.16)',
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   offlineCardLeft: {
     flexDirection: 'row',
@@ -613,10 +641,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   offlineIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: 'rgba(0, 229, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 229, 255, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -630,9 +660,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   offlineCardTitle: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    lineHeight: 15,
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 13,
+    lineHeight: 16,
     color: '#00e676',
   },
   betaTag: {
@@ -648,8 +678,8 @@ const styles = StyleSheet.create({
   },
   offlineCardSubtitle: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 10,
-    lineHeight: 13,
+    fontSize: 11,
+    lineHeight: 14,
     color: '#8da2be',
   },
   manageDataButton: {
@@ -657,14 +687,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     backgroundColor: '#1d4ed8',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     borderRadius: 9999,
+    shadowColor: '#1d4ed8',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 3,
   },
   manageDataText: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 11,
     color: '#ffffff',
   },
 });
-

@@ -76,7 +76,12 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             onPress={() => handleTabPress('ai')}
             style={styles.centerOrbButton}
           >
-            <VarunaOrb size={52} active={currentTab === 'ai'} />
+            <VarunaOrb
+              size={56}
+              active={currentTab === 'ai'}
+              speed={currentTab === 'ai' ? 'fast' : 'normal'}
+              intensity={currentTab === 'ai' ? 1.3 : 1.0}
+            />
           </TouchableOpacity>
         </View>
 
@@ -170,24 +175,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_500Medium',
   },
   centerOrbWrapper: {
-    top: -14,
+    top: -16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   centerOrbButton: {
     width: 60,
     height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(3, 9, 18, 0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(0, 229, 255, 0.45)',
-    shadowColor: '#00e5ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 10,
+    backgroundColor: 'transparent',
   },
   alertIconContainer: {
     position: 'relative',

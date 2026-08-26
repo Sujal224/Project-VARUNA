@@ -32,31 +32,31 @@ export const QuickActionsRow: React.FC<QuickActionsRowProps> = ({
       id: 'pfz',
       label: 'Find PFZ',
       tab: 'map',
-      icon: <Fish size={20} color="#38bdf8" />,
+      icon: <Fish size={18} color="#38bdf8" />,
     },
     {
       id: 'weather',
       label: 'Check Weather',
       tab: 'home',
-      icon: <CloudSun size={20} color="#38bdf8" />,
+      icon: <CloudSun size={18} color="#38bdf8" />,
     },
     {
       id: 'tides',
       label: 'Tide & Currents',
       tab: 'home',
-      icon: <Waves size={20} color="#38bdf8" />,
+      icon: <Waves size={18} color="#38bdf8" />,
     },
     {
       id: 'alerts',
       label: 'Safety Alerts',
       tab: 'alerts',
-      icon: <AlertTriangle size={20} color="#38bdf8" />,
+      icon: <AlertTriangle size={18} color="#38bdf8" />,
     },
     {
       id: 'safe_route',
       label: 'Safe Route',
       tab: 'map',
-      icon: <Compass size={20} color="#38bdf8" />,
+      icon: <Compass size={18} color="#38bdf8" />,
     },
   ];
 
@@ -85,7 +85,7 @@ export const QuickActionsRow: React.FC<QuickActionsRowProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* 5 Actions Horizontal Row / Scroll */}
+      {/* 5 Liquid Glass Tiles Horizontal Row */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 18,
     color: '#ffffff',
   },
@@ -141,21 +141,29 @@ const styles = StyleSheet.create({
   actionCard: {
     width: 68,
     height: 82,
-    backgroundColor: 'rgba(8, 20, 36, 0.65)',
+    backgroundColor: 'rgba(8, 20, 38, 0.75)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopColor: 'rgba(255, 255, 255, 0.16)',
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
     paddingVertical: 8,
     gap: 6,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
   },
   iconContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
   },

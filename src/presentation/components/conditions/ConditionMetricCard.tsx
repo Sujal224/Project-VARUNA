@@ -2,8 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Thermometer, Waves, Wind, Hexagon, ArrowUp, ArrowDown } from 'lucide-react-native';
 import { OceanMetric } from '../../../domain/models/types';
-import { Colors } from '../../../theme/colors';
-import { Typography } from '../../../theme/typography';
 import { Sparkline } from '../common/Sparkline';
 
 interface ConditionMetricCardProps {
@@ -15,11 +13,11 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
   const isSeaTemp = metric.id === 'sea_temp';
 
   const accentColor = isEmerald ? '#00e676' : '#00e5ff';
-  const statusColor = isSeaTemp ? '#00e5ff' : isEmerald ? '#00e676' : '#00e676';
+  const statusColor = isEmerald ? '#00e676' : '#00e5ff';
 
   const renderIcon = () => {
     const iconSize = 16;
-    const iconColor = '#8da2be';
+    const iconColor = isEmerald ? '#34d399' : '#38bdf8';
 
     switch (metric.icon) {
       case 'thermometer':
@@ -45,7 +43,7 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
 
   return (
     <View style={styles.card}>
-      {/* Background Micro Ocean Wave Sparkline */}
+      {/* Background Luminous Wave Sparkline */}
       <View style={styles.sparklineContainer}>
         <Sparkline
           data={metric.sparkline}
@@ -55,24 +53,24 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
         />
       </View>
 
-      {/* Top Header: Icon + Metric Name */}
+      {/* Top Header: Icon + Metric Label */}
       <View style={styles.headerRow}>
         {renderIcon()}
         <Text style={styles.metricName}>{metric.name}</Text>
       </View>
 
-      {/* Primary Metric Value */}
+      {/* Primary Value Readout */}
       <View style={styles.valueRow}>
         <Text style={styles.valueText}>{metric.value}</Text>
         <Text style={styles.unitText}>{metric.unit}</Text>
       </View>
 
-      {/* Bottom Trend & Status Indicator */}
+      {/* Bottom Status & Trend */}
       <View style={styles.statusRow}>
         {metric.id === 'sea_temp' ? (
-          <ArrowUp size={12} color={statusColor} strokeWidth={2.5} style={styles.trendIcon} />
+          <ArrowUp size={11} color={statusColor} strokeWidth={2.5} style={styles.trendIcon} />
         ) : metric.id === 'wind_speed' ? (
-          <ArrowDown size={12} color={statusColor} strokeWidth={2.5} style={styles.trendIcon} />
+          <ArrowDown size={11} color={statusColor} strokeWidth={2.5} style={styles.trendIcon} />
         ) : (
           <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
         )}
@@ -86,28 +84,34 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'rgba(8, 20, 36, 0.65)',
+    backgroundColor: 'rgba(9, 23, 44, 0.72)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 18,
-    paddingHorizontal: 15,
-    paddingVertical: 14,
+    borderTopColor: 'rgba(255, 255, 255, 0.16)',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
     position: 'relative',
     overflow: 'hidden',
     minHeight: 114,
     justifyContent: 'space-between',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   sparklineContainer: {
     position: 'absolute',
-    bottom: 0,
-    right: -5,
-    left: -5,
-    opacity: 0.75,
+    bottom: -2,
+    right: -4,
+    left: -4,
+    opacity: 0.85,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
+    gap: 6,
     zIndex: 2,
   },
   metricName: {
@@ -123,11 +127,11 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   valueText: {
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 20,
     lineHeight: 24,
     color: '#ffffff',
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
   },
   unitText: {
     fontFamily: 'Inter_400Regular',
@@ -139,11 +143,11 @@ const styles = StyleSheet.create({
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
     zIndex: 2,
   },
   trendIcon: {
-    marginRight: -1,
+    marginRight: 0,
   },
   statusDot: {
     width: 5,
@@ -157,4 +161,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 });
-

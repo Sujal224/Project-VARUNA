@@ -154,7 +154,7 @@ export const VarunaAiScreen: React.FC = () => {
 
           {isProcessing && (
             <View style={styles.processingRow}>
-              <VarunaOrb size={24} />
+              <VarunaOrb size={28} speed="fast" intensity={1.3} />
               <Text style={styles.processingText}>Synthesizing ocean telemetry...</Text>
             </View>
           )}

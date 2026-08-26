@@ -4,7 +4,6 @@ import { Sparkles, ArrowRight, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { VarunaInsight } from '../../../domain/models/types';
-import { Colors } from '../../../theme/colors';
 import { ConfidenceRing } from '../common/ConfidenceRing';
 
 interface VarunaInsightCardProps {
@@ -30,9 +29,9 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Ambient Blue/Indigo Glow in Top Corner */}
+      {/* Top-Edge Liquid Glass Specular Sheen Gradient */}
       <LinearGradient
-        colors={['rgba(37, 99, 235, 0.18)', 'rgba(0, 229, 255, 0.06)', 'transparent']}
+        colors={['rgba(56, 189, 248, 0.14)', 'rgba(37, 99, 235, 0.06)', 'transparent']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0.8, y: 0.8 }}
         style={styles.ambientGlow}
@@ -64,7 +63,7 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
               style={styles.primaryButton}
             >
               <Text style={styles.primaryButtonText}>View PFZ Map</Text>
-              <ArrowRight size={14} color="#ffffff" />
+              <ArrowRight size={13} color="#ffffff" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -72,7 +71,7 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
               onPress={handleExplainPress}
               style={styles.secondaryButton}
             >
-              <Star size={12} color="#38bdf8" fill="#38bdf8" />
+              <Star size={11} color="#38bdf8" fill="#38bdf8" />
               <Text style={styles.secondaryButtonText}>Why this recommendation?</Text>
             </TouchableOpacity>
           </View>
@@ -80,7 +79,7 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
 
         {/* Right Side: Confidence Ring */}
         <View style={styles.ringSection}>
-          <ConfidenceRing percent={insight.confidencePercent} size={92} strokeWidth={6} />
+          <ConfidenceRing percent={insight.confidencePercent} size={92} strokeWidth={6.5} />
         </View>
       </View>
     </View>
@@ -89,26 +88,32 @@ export const VarunaInsightCard: React.FC<VarunaInsightCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(8, 20, 36, 0.65)',
+    backgroundColor: 'rgba(7, 18, 38, 0.82)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 20,
-    padding: 16,
+    borderColor: 'rgba(255, 255, 255, 0.09)',
+    borderTopColor: 'rgba(255, 255, 255, 0.18)',
+    borderRadius: 22,
+    padding: 18,
     position: 'relative',
     overflow: 'hidden',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
   ambientGlow: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: 220,
-    height: 180,
+    width: 240,
+    height: 190,
   },
   contentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 12,
   },
   textSection: {
     flex: 1,
@@ -121,12 +126,12 @@ const styles = StyleSheet.create({
   },
   badgeTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 18,
     color: '#ffffff',
   },
   timeTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 9999,
@@ -136,18 +141,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_400Regular',
     fontSize: 10,
     lineHeight: 12,
-    color: '#94a3b8',
+    color: '#8da2be',
   },
   headlineText: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
-    lineHeight: 18,
+    fontFamily: 'Inter_500Medium',
+    fontSize: 14,
+    lineHeight: 20,
     color: '#ffffff',
   },
   explanationText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 12,
+    lineHeight: 17,
     color: '#8da2be',
   },
   actionsRow: {
@@ -160,19 +165,20 @@ const styles = StyleSheet.create({
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     backgroundColor: '#1d4ed8',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 9,
     borderRadius: 9999,
     shadowColor: '#1d4ed8',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    elevation: 4,
   },
   primaryButtonText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 11,
+    fontSize: 11.5,
     lineHeight: 14,
     color: '#ffffff',
   },
@@ -180,11 +186,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 11,
+    paddingVertical: 8,
     borderRadius: 9999,
   },
   secondaryButtonText: {
@@ -196,7 +202,6 @@ const styles = StyleSheet.create({
   ringSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: 4,
+    paddingLeft: 2,
   },
 });
-
