@@ -27,6 +27,7 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
+import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
 import { QuickActionsRow } from '../components/common/QuickActionsRow';
@@ -80,7 +81,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <View style={styles.topHeader}>
           {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={42} />
+            <VarunaOrb size={40} />
             <View style={styles.brandTitleContainer}>
               <Text style={styles.brandName}>VARUNA</Text>
               <Text style={styles.brandTagline}>MARINE INTELLIGENCE</Text>
@@ -90,7 +91,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Right: Offline Ready Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerActions}>
             <View style={styles.offlineReadyPill}>
-              <Waveform size={14} color="#00e676" />
+              <Waveform size={13} color="#00e676" />
               <Text style={styles.offlineReadyText}>Offline Ready</Text>
             </View>
 
@@ -271,6 +272,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </TouchableOpacity>
           </ScrollView>
 
+          {/* Ocean Radar & Bathymetry Geospatial Visualizer Section */}
+          <OceanRadarVisualizer
+            onPressPfz={() => onNavigateTab('map')}
+            onPressCyclone={() => onNavigateTab('alerts')}
+          />
+
           {/* Real-Time Conditions Master Liquid Glass Container */}
           <View style={styles.conditionsSection}>
             <View style={styles.conditionsHeader}>
@@ -293,14 +300,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </TouchableOpacity>
             </View>
 
-            {/* 2x2 Metric Cards Grid */}
-            <View style={styles.metricsGrid}>
+            {/* Smooth Horizontal Carousel for 4 Metric Cards */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.metricsScroll}
+            >
               {metrics.map((metric) => (
-                <View key={metric.id} style={styles.metricGridItem}>
-                  <ConditionMetricCard metric={metric} />
-                </View>
+                <ConditionMetricCard key={metric.id} metric={metric} />
               ))}
-            </View>
+            </ScrollView>
           </View>
 
           {/* VARUNA AI Insight Card */}
@@ -368,9 +377,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginTop: 4,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    marginTop: 2,
   },
   brandGroup: {
     flexDirection: 'row',
@@ -378,42 +387,42 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   brandTitleContainer: {
-    gap: 2,
+    gap: 1,
   },
   brandName: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_700Bold',
     fontSize: 15,
-    lineHeight: 17,
-    letterSpacing: 2.5,
+    lineHeight: 18,
+    letterSpacing: 2.2,
     color: '#ffffff',
   },
   brandTagline: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 8,
-    lineHeight: 10,
-    letterSpacing: 1.4,
+    fontSize: 7.5,
+    lineHeight: 9.5,
+    letterSpacing: 1.2,
     color: '#8da2be',
     opacity: 0.85,
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   offlineReadyPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
     backgroundColor: 'rgba(0, 230, 118, 0.08)',
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.25)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 9,
     paddingVertical: 5,
     borderRadius: 9999,
   },
   offlineReadyText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 10,
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 9.5,
     color: '#00e676',
   },
   headerIconButton: {
@@ -452,26 +461,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 18,
-    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingTop: 10,
     paddingBottom: 135,
-    gap: 20,
+    gap: 16,
   },
   heroSection: {
-    gap: 6,
-    marginTop: 4,
+    gap: 5,
+    marginTop: 2,
   },
   heroHeadline: {
     fontFamily: 'PlayfairDisplay_600SemiBold',
-    fontSize: 32,
-    lineHeight: 38,
-    letterSpacing: -0.5,
+    fontSize: 30,
+    lineHeight: 36,
+    letterSpacing: -0.4,
     color: '#ffffff',
   },
   heroSubtext: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 13.5,
+    lineHeight: 17,
     color: '#8da2be',
   },
   searchGateway: {
@@ -482,7 +491,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderTopColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 9999,
-    paddingVertical: 5,
+    paddingVertical: 4,
     paddingHorizontal: 6,
     position: 'relative',
     shadowColor: '#000000',
@@ -497,20 +506,20 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontFamily: 'Inter_400Regular',
-    fontSize: 14,
+    fontSize: 13.5,
     color: '#ffffff',
     paddingHorizontal: 4,
   },
   micButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 2,
   },
   filterScroll: {
-    gap: 8,
+    gap: 7,
   },
   filterPill: {
     flexDirection: 'row',
@@ -520,8 +529,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     borderTopColor: 'rgba(255, 255, 255, 0.14)',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingHorizontal: 13,
+    paddingVertical: 6.5,
     borderRadius: 9999,
   },
   filterPillActive: {
@@ -531,7 +540,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontFamily: 'Inter_500Medium',
-    fontSize: 12,
+    fontSize: 11.5,
     color: '#8da2be',
   },
   filterTextActive: {
@@ -543,9 +552,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     borderTopColor: 'rgba(255, 255, 255, 0.18)',
-    borderRadius: 22,
-    padding: 16,
-    gap: 14,
+    borderRadius: 20,
+    padding: 14,
+    gap: 12,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
@@ -560,12 +569,12 @@ const styles = StyleSheet.create({
   conditionsTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
   },
   conditionsTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 15,
-    lineHeight: 19,
+    fontSize: 14.5,
+    lineHeight: 18,
     color: '#ffffff',
   },
   liveBadge: {
@@ -575,8 +584,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 230, 118, 0.12)',
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.25)',
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 2.5,
     borderRadius: 9999,
   },
   liveDot: {
@@ -587,10 +596,10 @@ const styles = StyleSheet.create({
   },
   liveText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 9,
+    fontSize: 8.5,
     textTransform: 'uppercase',
     color: '#00e676',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
   },
   locationSelector: {
     flexDirection: 'row',
@@ -599,17 +608,14 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 12,
+    fontSize: 11.5,
     color: '#8da2be',
   },
-  metricsGrid: {
+  metricsScroll: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: 10,
-    justifyContent: 'space-between',
-  },
-  metricGridItem: {
-    width: '48%',
+    paddingRight: 4,
   },
   offlineCard: {
     flexDirection: 'row',
@@ -619,8 +625,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     borderTopColor: 'rgba(255, 255, 255, 0.16)',
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 18,
+    padding: 14,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -630,16 +636,17 @@ const styles = StyleSheet.create({
   offlineCardLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     flex: 1,
+    marginRight: 10,
   },
   offlineIconCircle: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 12,
     backgroundColor: 'rgba(0, 229, 255, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.15)',
+    borderColor: 'rgba(0, 229, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -656,10 +663,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
     lineHeight: 16,
-    color: '#00e676',
+    color: '#ffffff',
   },
   betaTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 230, 118, 0.25)',
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 4,
@@ -667,11 +676,12 @@ const styles = StyleSheet.create({
   betaTagText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 8,
-    color: '#8da2be',
+    color: '#00e676',
+    letterSpacing: 0.4,
   },
   offlineCardSubtitle: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
+    fontSize: 10.5,
     lineHeight: 14,
     color: '#8da2be',
   },
@@ -679,15 +689,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#1d4ed8',
-    paddingHorizontal: 13,
-    paddingVertical: 8,
+    backgroundColor: 'rgba(0, 119, 255, 0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 150, 255, 0.45)',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderRadius: 9999,
-    shadowColor: '#1d4ed8',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 3,
   },
   manageDataText: {
     fontFamily: 'Inter_600SemiBold',

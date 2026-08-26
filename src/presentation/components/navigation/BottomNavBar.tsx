@@ -27,7 +27,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 }) => {
   // Fluid responsive width: full pill with comfortable horizontal margins
   const navWidth = Math.min(screenWidth - 24, 430);
-  const navHeight = 88; // Total canvas height including raised center dome
+  const navHeight = 66; // Sleek uniform capsule height
 
   // Center Orb touch spring controller
   const orbScaleAnim = useRef(new Animated.Value(1)).current;
@@ -77,12 +77,12 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   };
 
   return (
-    <View style={[styles.floatingWrapper, { width: navWidth }]}>
-      {/* 1. Precision Contoured Glass Backdrop (Monolithic Center Dome & Grazing Rim) */}
+    <View style={[styles.floatingWrapper, { width: navWidth, height: navHeight }]}>
+      {/* 1. Precision Uniform Glass Capsule Backdrop (Absolute Fill) */}
       <NavContourBackdrop width={navWidth} height={navHeight} />
 
-      {/* 2. Tab Navigation Items Container */}
-      <View style={[styles.tabContentBar, { width: navWidth }]}>
+      {/* 2. Symmetrically Centered Navigation Items Container (Directly on the backdrop) */}
+      <View style={[styles.tabContentBar, { width: navWidth, height: navHeight }]}>
         {/* Left Tab 1: Home */}
         <View style={styles.tabColumn}>
           <NavTabButton
@@ -103,7 +103,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           />
         </View>
 
-        {/* Center Raised Signature VARUNA Orb (Concentrically Nested in Center Dome) */}
+        {/* Center Signature VARUNA Orb (Elegantly Nested in Uniform Pill Center) */}
         <View style={styles.centerOrbAnchor}>
           <TouchableWithoutFeedback
             onPressIn={handleOrbPressIn}
@@ -122,7 +122,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               ]}
             >
               <VarunaOrb
-                size={58}
+                size={48}
                 active={true}
                 speed={currentTab === 'ai' ? 'fast' : 'normal'}
                 intensity={currentTab === 'ai' ? 1.35 : 1.0}
@@ -160,19 +160,17 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 const styles = StyleSheet.create({
   floatingWrapper: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 22 : 14,
+    bottom: Platform.OS === 'ios' ? 24 : 16,
     alignSelf: 'center',
-    height: 88,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     zIndex: 9999,
   },
   tabContentBar: {
-    height: 68,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
     position: 'relative',
     zIndex: 5,
   },
@@ -182,16 +180,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerOrbAnchor: {
-    width: 68,
-    height: 68,
+    width: 56,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    top: -19, // Concentrically positions orb center at y=35 inside the raised dome
     zIndex: 10,
   },
   orbTouchContainer: {
-    width: 58,
-    height: 58,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },

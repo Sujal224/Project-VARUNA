@@ -7,13 +7,12 @@ interface SparklineProps {
   width?: number;
   height?: number;
   color?: string;
-  fillColor?: string;
 }
 
 export const Sparkline: React.FC<SparklineProps> = ({
   data,
-  width = 140,
-  height = 36,
+  width = 110,
+  height = 32,
   color = '#00e5ff',
 }) => {
   if (!data || data.length < 2) return null;
@@ -24,7 +23,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
 
   const points = data.map((val, idx) => {
     const x = (idx / (data.length - 1)) * width;
-    const y = height - ((val - min) / range) * (height - 10) - 5;
+    const y = height - ((val - min) / range) * (height - 8) - 4;
     return { x, y };
   });
 
@@ -45,8 +44,8 @@ export const Sparkline: React.FC<SparklineProps> = ({
       <Svg width={width} height={height}>
         <Defs>
           <LinearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor={color} stopOpacity="0.4" />
-            <Stop offset="70%" stopColor={color} stopOpacity="0.1" />
+            <Stop offset="0%" stopColor={color} stopOpacity="0.3" />
+            <Stop offset="60%" stopColor={color} stopOpacity="0.08" />
             <Stop offset="100%" stopColor={color} stopOpacity="0" />
           </LinearGradient>
         </Defs>
@@ -56,7 +55,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
           d={pathD}
           fill="none"
           stroke={color}
-          strokeWidth="1.8"
+          strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -70,4 +69,3 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
-

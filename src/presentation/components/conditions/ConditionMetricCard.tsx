@@ -23,51 +23,51 @@ const getMetricTheme = (id: string, colorMode?: string): MetricTheme => {
     case 'sea_temp':
       return {
         primary: '#00e5ff',
-        cardBg: 'rgba(7, 22, 46, 0.78)',
-        cardBorder: 'rgba(0, 229, 255, 0.2)',
-        badgeBg: 'rgba(0, 229, 255, 0.12)',
-        badgeBorder: 'rgba(0, 229, 255, 0.25)',
-        statusBg: 'rgba(0, 229, 255, 0.12)',
+        cardBg: 'rgba(7, 22, 48, 0.85)',
+        cardBorder: 'rgba(0, 229, 255, 0.24)',
+        badgeBg: 'rgba(0, 229, 255, 0.14)',
+        badgeBorder: 'rgba(0, 229, 255, 0.3)',
+        statusBg: 'rgba(0, 229, 255, 0.14)',
         statusText: '#00e5ff',
       };
     case 'wave_height':
       return {
         primary: '#38bdf8',
-        cardBg: 'rgba(6, 20, 48, 0.78)',
-        cardBorder: 'rgba(56, 189, 248, 0.2)',
-        badgeBg: 'rgba(56, 189, 248, 0.12)',
-        badgeBorder: 'rgba(56, 189, 248, 0.25)',
-        statusBg: 'rgba(56, 189, 248, 0.12)',
+        cardBg: 'rgba(6, 20, 50, 0.85)',
+        cardBorder: 'rgba(56, 189, 248, 0.24)',
+        badgeBg: 'rgba(56, 189, 248, 0.14)',
+        badgeBorder: 'rgba(56, 189, 248, 0.3)',
+        statusBg: 'rgba(56, 189, 248, 0.14)',
         statusText: '#38bdf8',
       };
     case 'wind_speed':
       return {
-        primary: '#60a5fa',
-        cardBg: 'rgba(8, 22, 50, 0.78)',
-        cardBorder: 'rgba(96, 165, 250, 0.2)',
-        badgeBg: 'rgba(96, 165, 250, 0.12)',
-        badgeBorder: 'rgba(96, 165, 250, 0.25)',
-        statusBg: 'rgba(96, 165, 250, 0.12)',
-        statusText: '#60a5fa',
+        primary: '#818cf8',
+        cardBg: 'rgba(10, 22, 54, 0.85)',
+        cardBorder: 'rgba(129, 140, 248, 0.24)',
+        badgeBg: 'rgba(129, 140, 248, 0.14)',
+        badgeBorder: 'rgba(129, 140, 248, 0.3)',
+        statusBg: 'rgba(129, 140, 248, 0.14)',
+        statusText: '#818cf8',
       };
     case 'chlorophyll':
       return {
         primary: '#00e676',
-        cardBg: 'rgba(5, 26, 38, 0.78)',
-        cardBorder: 'rgba(0, 230, 118, 0.22)',
-        badgeBg: 'rgba(0, 230, 118, 0.12)',
-        badgeBorder: 'rgba(0, 230, 118, 0.28)',
-        statusBg: 'rgba(0, 230, 118, 0.14)',
+        cardBg: 'rgba(5, 26, 40, 0.85)',
+        cardBorder: 'rgba(0, 230, 118, 0.26)',
+        badgeBg: 'rgba(0, 230, 118, 0.14)',
+        badgeBorder: 'rgba(0, 230, 118, 0.32)',
+        statusBg: 'rgba(0, 230, 118, 0.15)',
         statusText: '#00e676',
       };
     default:
       return {
         primary: '#00e5ff',
-        cardBg: 'rgba(7, 22, 46, 0.78)',
-        cardBorder: 'rgba(0, 229, 255, 0.2)',
-        badgeBg: 'rgba(0, 229, 255, 0.12)',
-        badgeBorder: 'rgba(0, 229, 255, 0.25)',
-        statusBg: 'rgba(0, 229, 255, 0.12)',
+        cardBg: 'rgba(7, 22, 48, 0.85)',
+        cardBorder: 'rgba(0, 229, 255, 0.24)',
+        badgeBg: 'rgba(0, 229, 255, 0.14)',
+        badgeBorder: 'rgba(0, 229, 255, 0.3)',
+        statusBg: 'rgba(0, 229, 255, 0.14)',
         statusText: '#00e5ff',
       };
   }
@@ -77,7 +77,7 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
   const theme = getMetricTheme(metric.id, metric.colorMode);
 
   const renderIcon = () => {
-    const iconSize = 14;
+    const iconSize = 12;
     switch (metric.icon) {
       case 'thermometer':
         return <Thermometer size={iconSize} color={theme.primary} strokeWidth={2.2} />;
@@ -97,6 +97,7 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
   const getCleanStatusText = () => {
     if (metric.id === 'sea_temp') return '0.3°C';
     if (metric.id === 'wind_speed') return 'Calming';
+    if (metric.id === 'chlorophyll') return 'High';
     return metric.status.replace(/^[↑↓●\s]+/, '');
   };
 
@@ -111,16 +112,16 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
       ]}
     >
       {/* Background Luminous Wave Sparkline */}
-      <View style={styles.sparklineContainer}>
+      <View style={styles.sparklineContainer} pointerEvents="none">
         <Sparkline
           data={metric.sparkline}
-          width={165}
-          height={40}
+          width={124}
+          height={32}
           color={theme.primary}
         />
       </View>
 
-      {/* Tier 1: Header (Icon Badge + Metric Title) */}
+      {/* Tier 1: Header (Icon Badge + Full Metric Title) */}
       <View style={styles.headerRow}>
         <View
           style={[
@@ -133,12 +134,16 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
         >
           {renderIcon()}
         </View>
-        <Text style={styles.metricName}>{metric.name}</Text>
+        <Text style={styles.metricName} numberOfLines={1}>
+          {metric.name}
+        </Text>
       </View>
 
-      {/* Tier 2: Hero Value Readout */}
+      {/* Tier 2: Hero Value Readout with Clean Typography */}
       <View style={styles.valueRow}>
-        <Text style={styles.valueText}>{metric.value}</Text>
+        <Text style={styles.valueText}>
+          {metric.value}
+        </Text>
         <Text style={styles.unitText}>{metric.unit}</Text>
       </View>
 
@@ -153,9 +158,9 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
           ]}
         >
           {metric.id === 'sea_temp' ? (
-            <ArrowUp size={10} color={theme.statusText} strokeWidth={2.6} style={styles.trendIcon} />
+            <ArrowUp size={9} color={theme.statusText} strokeWidth={2.6} style={styles.trendIcon} />
           ) : metric.id === 'wind_speed' ? (
-            <ArrowDown size={10} color={theme.statusText} strokeWidth={2.6} style={styles.trendIcon} />
+            <ArrowDown size={9} color={theme.statusText} strokeWidth={2.6} style={styles.trendIcon} />
           ) : (
             <View style={[styles.statusDot, { backgroundColor: theme.statusText }]} />
           )}
@@ -170,94 +175,96 @@ export const ConditionMetricCard: React.FC<ConditionMetricCardProps> = ({ metric
 
 const styles = StyleSheet.create({
   card: {
+    width: 122,
+    minHeight: 118,
     borderWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.22)',
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    borderTopColor: 'rgba(255, 255, 255, 0.24)',
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 11,
     position: 'relative',
     overflow: 'hidden',
-    minHeight: 122,
     justifyContent: 'space-between',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
-    shadowRadius: 10,
+    shadowRadius: 8,
     elevation: 4,
   },
   sparklineContainer: {
     position: 'absolute',
-    bottom: -2,
+    bottom: -1,
     right: -4,
     left: -4,
-    opacity: 0.9,
+    opacity: 0.75,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    zIndex: 2,
+    gap: 6,
+    zIndex: 3,
   },
   iconBadge: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   metricName: {
     fontFamily: 'Inter_500Medium',
-    fontSize: 12,
-    lineHeight: 15,
+    fontSize: 11,
+    lineHeight: 14,
     color: '#94a3b8',
-    letterSpacing: 0.2,
+    flex: 1,
+    letterSpacing: -0.1,
   },
   valueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
     marginVertical: 3,
-    zIndex: 2,
+    zIndex: 3,
   },
   valueText: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 22,
-    lineHeight: 26,
+    fontSize: 17,
+    lineHeight: 21,
     color: '#ffffff',
-    letterSpacing: -0.4,
+    letterSpacing: -0.3,
   },
   unitText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 12,
-    lineHeight: 15,
+    fontSize: 10.5,
+    lineHeight: 14,
     color: '#8da2be',
-    marginLeft: 4,
+    marginLeft: 3,
   },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 2,
+    zIndex: 3,
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3.5,
     paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: 6,
   },
   trendIcon: {
-    marginRight: 1,
+    marginRight: 0,
   },
   statusDot: {
-    width: 4.5,
-    height: 4.5,
-    borderRadius: 2.25,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
   },
   statusText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 10.5,
-    lineHeight: 13,
-    letterSpacing: 0.3,
+    fontSize: 9.5,
+    lineHeight: 12,
+    letterSpacing: 0.2,
   },
 });
