@@ -61,7 +61,7 @@ export default function App() {
           />
         );
       case 'map':
-        return <MapScreen />;
+        return <MapScreen onNavigateTab={(tab) => setCurrentTab(tab)} />;
       case 'ai':
         return <VarunaAiScreen />;
       case 'alerts':

@@ -26,6 +26,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
+import { VarunaWordmark } from '../components/brand/VarunaWordmark';
 import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
 import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
@@ -79,13 +80,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <SafeAreaView style={styles.safeArea}>
         {/* Top App Header */}
         <View style={styles.topHeader}>
-          {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb */}
+          {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb & Exact Vector Wordmark */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={40} />
-            <View style={styles.brandTitleContainer}>
-              <Text style={styles.brandName}>VARUNA</Text>
-              <Text style={styles.brandTagline}>MARINE INTELLIGENCE</Text>
-            </View>
+            <VarunaOrb size={38} />
+            <VarunaWordmark scale={0.72} />
           </View>
 
           {/* Right: Offline Ready Pill, Bell Notification, Captain Avatar */}
