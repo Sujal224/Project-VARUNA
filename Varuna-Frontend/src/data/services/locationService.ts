@@ -88,6 +88,52 @@ class LocationService {
     this.currentGpsState.permissionStatus = 'requesting';
     this.emitUpdate(this.currentGpsState);
 
+    // Fast web browser geolocation with IP fallback
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+      return new Promise<boolean>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            this.currentGpsState.permissionStatus = 'granted';
+            this.applyGpsFix(
+              pos.coords.latitude,
+              pos.coords.longitude,
+              pos.coords.speed,
+              pos.coords.heading,
+              pos.coords.accuracy,
+              pos.timestamp
+            );
+            this.isRequesting = false;
+            resolve(true);
+          },
+          async (_err) => {
+            // IP-based city fallback if hardware GPS is not allowed
+            try {
+              const res = await fetch('https://ipapi.co/json/');
+              if (res.ok) {
+                const data = await res.json();
+                if (data && data.latitude && data.longitude) {
+                  this.selectedLocationName = data.city || 'Local Waters';
+                  this.selectedRegionName = data.region || data.country_name || 'Maritime Zone';
+                  this.currentGpsState.permissionStatus = 'granted';
+                  this.applyGpsFix(data.latitude, data.longitude, 0, 0, 5000, Date.now());
+                  this.isRequesting = false;
+                  resolve(true);
+                  return;
+                }
+              }
+            } catch (ipErr) {}
+
+            this.currentGpsState.permissionStatus = 'denied';
+            this.currentGpsState.isGpsLocked = false;
+            this.emitUpdate(this.currentGpsState);
+            this.isRequesting = false;
+            resolve(false);
+          },
+          { enableHighAccuracy: true, timeout: 6000 }
+        );
+      });
+    }
+
     try {
       const Location = await import('expo-location');
 

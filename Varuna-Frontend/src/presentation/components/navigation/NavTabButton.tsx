@@ -6,7 +6,7 @@ import {
   Animated,
   LayoutChangeEvent,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 import { AnimatedHomeIcon } from './icons/AnimatedHomeIcon';
 import { AnimatedMapIcon } from './icons/AnimatedMapIcon';
 import { AnimatedBellIcon } from './icons/AnimatedBellIcon';

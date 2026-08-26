@@ -21,7 +21,7 @@ import {
   Shield,
   Compass,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../utils/haptics';
 import { Colors } from '../../theme/colors';
 import { Typography } from '../../theme/typography';
 import { VarunaOrb } from '../components/brand/VarunaOrb';

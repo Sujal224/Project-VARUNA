@@ -16,8 +16,12 @@ export interface EnvironmentConfig {
   FIREBASE_AUTH_DOMAIN: string;
   FIREBASE_PROJECT_ID: string;
   FIREBASE_STORAGE_BUCKET: string;
+  MAPTILER_API_KEY: string;
   MAP_TILE_SERVER_URL: string;
   OPEN_SEA_MAP_URL: string;
+  MAPTILER_OCEAN_STYLE_URL: string;
+  MAPTILER_SATELLITE_STYLE_URL: string;
+  MAPTILER_DARK_STYLE_URL: string;
   IS_PRODUCTION: boolean;
 }
 
@@ -47,17 +51,23 @@ const getEnvVar = (key: string, defaultValue: string): string => {
   return process.env[key] || defaultValue;
 };
 
+const MAPTILER_KEY = getEnvVar('EXPO_PUBLIC_MAPTILER_KEY', 'QNyvsXNdaNX1BMZUMwQB');
+
 export const ENV: EnvironmentConfig = {
   API_BASE_URL: resolveBackendBaseUrl(),
   API_V1_PREFIX: '/api/v1',
   API_TIMEOUT_MS: 10000,
-  USE_MOCK_DATA_FALLBACK: getEnvVar('EXPO_PUBLIC_USE_MOCK_FALLBACK', 'true') === 'true',
+  USE_MOCK_DATA_FALLBACK: getEnvVar('EXPO_PUBLIC_USE_MOCK_FALLBACK', 'false') === 'true',
   FIREBASE_API_KEY: getEnvVar('EXPO_PUBLIC_FIREBASE_API_KEY', 'AIzaSyMockKeyForDevOnly_Varuna'),
   FIREBASE_AUTH_DOMAIN: getEnvVar('EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN', 'project-varuna.firebaseapp.com'),
   FIREBASE_PROJECT_ID: getEnvVar('EXPO_PUBLIC_FIREBASE_PROJECT_ID', 'project-varuna'),
   FIREBASE_STORAGE_BUCKET: getEnvVar('EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET', 'project-varuna.appspot.com'),
-  MAP_TILE_SERVER_URL: getEnvVar('EXPO_PUBLIC_MAP_TILE_URL', 'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png'),
+  MAPTILER_API_KEY: MAPTILER_KEY,
+  MAP_TILE_SERVER_URL: `https://api.maptiler.com/maps/ocean/256/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
   OPEN_SEA_MAP_URL: getEnvVar('EXPO_PUBLIC_OPENSEAMAP_URL', 'https://tiles.openseamap.org/seamap/{z}/{x}/{y}.png'),
+  MAPTILER_OCEAN_STYLE_URL: `https://api.maptiler.com/maps/ocean/style.json?key=${MAPTILER_KEY}`,
+  MAPTILER_SATELLITE_STYLE_URL: `https://api.maptiler.com/maps/hybrid/style.json?key=${MAPTILER_KEY}`,
+  MAPTILER_DARK_STYLE_URL: `https://api.maptiler.com/maps/dataviz-dark/style.json?key=${MAPTILER_KEY}`,
   IS_PRODUCTION: process.env.NODE_ENV === 'production',
 };
 

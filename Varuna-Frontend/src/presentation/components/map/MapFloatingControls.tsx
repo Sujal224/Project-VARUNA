@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import {
-  Layers,
+  Compass,
   Ship,
-  Activity,
-  MoreHorizontal,
+  Globe,
+  Anchor,
   Crosshair,
   Plus,
   Minus,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 
 export type MapControlTab = 'layers' | 'vessels' | 'heatmap' | 'more';
 
@@ -48,7 +48,7 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
     <View style={styles.controlsLayer} pointerEvents="box-none">
       {/* 1. Left Vertical Floating Control Bar */}
       <View style={styles.leftControlColumn}>
-        {/* Tab 1: Layers */}
+        {/* Tab 1: Nautical Basemap */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => handleTabPress('layers')}
@@ -58,7 +58,7 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
           ]}
         >
           {activeTab === 'layers' && <View style={styles.activeDotBadge} />}
-          <Layers
+          <Compass
             size={18}
             color={activeTab === 'layers' ? '#00e5ff' : '#8da2be'}
             strokeWidth={2}
@@ -69,11 +69,11 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
               activeTab === 'layers' && styles.controlLabelActive,
             ]}
           >
-            Layers
+            Nautical
           </Text>
         </TouchableOpacity>
 
-        {/* Tab 2: Vessels */}
+        {/* Tab 2: AIS Fleet Radar */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => handleTabPress('vessels')}
@@ -82,6 +82,7 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
             activeTab === 'vessels' && styles.controlButtonActive,
           ]}
         >
+          {activeTab === 'vessels' && <View style={styles.activeDotBadge} />}
           <Ship
             size={18}
             color={activeTab === 'vessels' ? '#00e5ff' : '#8da2be'}
@@ -93,11 +94,11 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
               activeTab === 'vessels' && styles.controlLabelActive,
             ]}
           >
-            Vessels
+            AIS Fleet
           </Text>
         </TouchableOpacity>
 
-        {/* Tab 3: Heatmap */}
+        {/* Tab 3: Satellite Imagery */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => handleTabPress('heatmap')}
@@ -106,7 +107,8 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
             activeTab === 'heatmap' && styles.controlButtonActive,
           ]}
         >
-          <Activity
+          {activeTab === 'heatmap' && <View style={styles.activeDotBadge} />}
+          <Globe
             size={18}
             color={activeTab === 'heatmap' ? '#00e5ff' : '#8da2be'}
             strokeWidth={1.8}
@@ -117,11 +119,11 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
               activeTab === 'heatmap' && styles.controlLabelActive,
             ]}
           >
-            Heatmap
+            Satellite
           </Text>
         </TouchableOpacity>
 
-        {/* Tab 4: More */}
+        {/* Tab 4: Seamarks & Hazards */}
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() => handleTabPress('more')}
@@ -130,7 +132,8 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
             activeTab === 'more' && styles.controlButtonActive,
           ]}
         >
-          <MoreHorizontal
+          {activeTab === 'more' && <View style={styles.activeDotBadge} />}
+          <Anchor
             size={18}
             color={activeTab === 'more' ? '#00e5ff' : '#8da2be'}
             strokeWidth={2}
@@ -141,7 +144,7 @@ export const MapFloatingControls: React.FC<MapFloatingControlsProps> = ({
               activeTab === 'more' && styles.controlLabelActive,
             ]}
           >
-            More
+            Seamarks
           </Text>
         </TouchableOpacity>
       </View>

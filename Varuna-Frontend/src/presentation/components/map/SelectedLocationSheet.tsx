@@ -18,7 +18,7 @@ import {
   ChevronRight,
   AlertTriangle,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 import { MapMarkerLocation } from './InteractiveOceanMap';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');

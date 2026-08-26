@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -22,6 +22,7 @@ import { MapScreen } from './src/presentation/screens/MapScreen';
 import { VarunaAiScreen } from './src/presentation/screens/VarunaAiScreen';
 import { AlertsScreen } from './src/presentation/screens/AlertsScreen';
 import { ProfileScreen } from './src/presentation/screens/ProfileScreen';
+import { ScreenErrorBoundary } from './src/presentation/components/common/ScreenErrorBoundary';
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -34,14 +35,14 @@ export default function App() {
     PlayfairDisplay_700Bold,
   });
 
-  const [timedOut, setTimedOut] = useState(false);
+  const [timedOut, setTimedOut] = useState(Platform.OS === 'web');
   const [currentTab, setCurrentTab] = useState<TabType>('home');
 
   useEffect(() => {
-    // Safety fallback: Proceed after 1.5s even if font loading is delayed
+    // Safety fallback: Proceed after 600ms even if custom font loading is delayed
     const timer = setTimeout(() => {
       setTimedOut(true);
-    }, 1500);
+    }, 600);
     return () => clearTimeout(timer);
   }, []);
 
@@ -87,8 +88,12 @@ export default function App() {
       {/* Persistent Global 60 FPS Atmospheric Video Background */}
       <AtmosphericBackground />
 
-      {/* Screen Content View */}
-      <View style={styles.screenWrapper}>{renderCurrentScreen()}</View>
+      {/* Screen Content View with Fail-Safe Error Boundary */}
+      <View style={styles.screenWrapper}>
+        <ScreenErrorBoundary fallbackTitle="VARUNA Interface Shield Active">
+          {renderCurrentScreen()}
+        </ScreenErrorBoundary>
+      </View>
 
       {/* Floating Glass Bottom Navigation */}
       <BottomNavBar

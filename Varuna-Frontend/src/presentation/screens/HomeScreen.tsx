@@ -24,7 +24,7 @@ import {
   Database,
   Download,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../utils/haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { VarunaWordmark } from '../components/brand/VarunaWordmark';

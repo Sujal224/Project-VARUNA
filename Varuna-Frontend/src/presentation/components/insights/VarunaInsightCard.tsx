@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Sparkles, ArrowRight, Star } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 import { VarunaInsight } from '../../../domain/models/types';
 import { ConfidenceRing } from '../common/ConfidenceRing';
 

@@ -1,112 +1,123 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions, Platform, Image } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Load the high-quality ocean motion video asset directly
-const oceanVideoSource = require('../../../../assets/frames/Ocean_motion_1.mp4');
+let oceanVideoSource: any = null;
+try {
+  oceanVideoSource = require('../../../../assets/frames/Ocean_motion_1.mp4');
+} catch (e) {
+  oceanVideoSource = null;
+}
 
 export const AtmosphericBackground: React.FC = () => {
   const { width, height } = useWindowDimensions();
   const videoRef = useRef<any>(null);
+  const [videoError, setVideoError] = useState(false);
 
   // Dynamic height: covers hero typography, search bar, and blends into radar visualizer
   const videoHeight = Math.max(height * 0.76, 590);
 
   // Web-specific autoplay and continuous 60fps loop lifecycle management
   useEffect(() => {
-    if (Platform.OS !== 'web') return;
+    if (Platform.OS !== 'web' || videoError) return;
 
-    const videoEl = videoRef.current as HTMLVideoElement | null;
-    if (!videoEl) return;
+    try {
+      const videoEl = videoRef.current as HTMLVideoElement | null;
+      if (!videoEl) return;
 
-    videoEl.muted = true;
-    videoEl.defaultMuted = true;
-    videoEl.loop = true;
-    videoEl.playsInline = true;
-    videoEl.setAttribute('playsinline', 'true');
-    videoEl.setAttribute('webkit-playsinline', 'true');
-    videoEl.setAttribute('muted', 'true');
-    videoEl.setAttribute('autoplay', 'true');
-    videoEl.setAttribute('loop', 'true');
+      videoEl.muted = true;
+      videoEl.defaultMuted = true;
+      videoEl.loop = true;
+      videoEl.playsInline = true;
 
-    const ensurePlayback = () => {
-      if (videoEl && videoEl.paused) {
-        const promise = videoEl.play();
-        if (promise !== undefined) {
-          promise.catch(() => {
-            // Autoplay policy: trigger on first user gesture
-            const handleFirstGesture = () => {
-              videoEl?.play().catch(() => {});
-              window.removeEventListener('click', handleFirstGesture);
-              window.removeEventListener('touchstart', handleFirstGesture);
-              window.removeEventListener('keydown', handleFirstGesture);
-            };
-            window.addEventListener('click', handleFirstGesture, { once: true, passive: true });
-            window.addEventListener('touchstart', handleFirstGesture, { once: true, passive: true });
-            window.addEventListener('keydown', handleFirstGesture, { once: true, passive: true });
-          });
+      try {
+        videoEl.setAttribute('playsinline', 'true');
+        videoEl.setAttribute('webkit-playsinline', 'true');
+        videoEl.setAttribute('muted', 'true');
+        videoEl.setAttribute('autoplay', 'true');
+        videoEl.setAttribute('loop', 'true');
+      } catch (err) {}
+
+      const safePlay = () => {
+        try {
+          if (videoEl && videoEl.paused) {
+            const promise = videoEl.play();
+            if (promise !== undefined && typeof promise.catch === 'function') {
+              promise.catch(() => {
+                // Ignore autoplay policy restriction
+              });
+            }
+          }
+        } catch (err) {}
+      };
+
+      safePlay();
+
+      const handleUserGesture = () => {
+        safePlay();
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('click', handleUserGesture);
+          window.removeEventListener('touchstart', handleUserGesture);
         }
-      }
-    };
+      };
 
-    ensurePlayback();
-
-    const handleVisibilityChange = () => {
-      if (typeof document !== 'undefined' && !document.hidden) {
-        ensurePlayback();
-      }
-    };
-
-    const handleFocus = () => {
-      ensurePlayback();
-    };
-
-    const handleEnded = () => {
-      if (videoEl) {
-        videoEl.currentTime = 0;
-        videoEl.play().catch(() => {});
-      }
-    };
-
-    const handleError = () => {
-      if (videoEl) {
-        videoEl.load();
-        ensurePlayback();
-      }
-    };
-
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
-    if (typeof window !== 'undefined') {
-      window.addEventListener('focus', handleFocus);
-    }
-    videoEl.addEventListener('ended', handleEnded);
-    videoEl.addEventListener('error', handleError);
-
-    return () => {
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
       if (typeof window !== 'undefined') {
-        window.removeEventListener('focus', handleFocus);
+        window.addEventListener('click', handleUserGesture, { once: true, passive: true });
+        window.addEventListener('touchstart', handleUserGesture, { once: true, passive: true });
       }
-      videoEl.removeEventListener('ended', handleEnded);
-      videoEl.removeEventListener('error', handleError);
-    };
-  }, []);
+
+      const handleEnded = () => {
+        try {
+          if (videoEl) {
+            videoEl.currentTime = 0;
+            safePlay();
+          }
+        } catch (err) {}
+      };
+
+      const handleError = () => {
+        setVideoError(true);
+      };
+
+      videoEl.addEventListener('ended', handleEnded);
+      videoEl.addEventListener('error', handleError);
+
+      return () => {
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('click', handleUserGesture);
+          window.removeEventListener('touchstart', handleUserGesture);
+        }
+        try {
+          videoEl.removeEventListener('ended', handleEnded);
+          videoEl.removeEventListener('error', handleError);
+        } catch (err) {}
+      };
+    } catch (err) {
+      setVideoError(true);
+    }
+  }, [videoError]);
 
   // Resolve Web asset source URL reliably
-  const resolvedVideoUri =
-    Platform.OS === 'web'
-      ? typeof oceanVideoSource === 'string'
-        ? oceanVideoSource
-        : oceanVideoSource?.default ||
-          oceanVideoSource?.uri ||
-          Image.resolveAssetSource(oceanVideoSource)?.uri ||
-          oceanVideoSource
-      : null;
+  let resolvedVideoUri: string | undefined = undefined;
+  if (Platform.OS === 'web' && oceanVideoSource && !videoError) {
+    try {
+      if (typeof oceanVideoSource === 'string') {
+        resolvedVideoUri = oceanVideoSource;
+      } else if (oceanVideoSource?.default && typeof oceanVideoSource.default === 'string') {
+        resolvedVideoUri = oceanVideoSource.default;
+      } else if (oceanVideoSource?.uri && typeof oceanVideoSource.uri === 'string') {
+        resolvedVideoUri = oceanVideoSource.uri;
+      } else {
+        const resolved = Image.resolveAssetSource(oceanVideoSource);
+        if (resolved?.uri) {
+          resolvedVideoUri = resolved.uri;
+        }
+      }
+    } catch (e) {
+      resolvedVideoUri = undefined;
+    }
+  }
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
@@ -120,32 +131,39 @@ export const AtmosphericBackground: React.FC = () => {
       {/* Pristine Native Continuous 60 FPS Video Canvas */}
       <View style={[styles.videoWrapper, { width, height: videoHeight }]}>
         {Platform.OS === 'web' ? (
-          <video
-            ref={videoRef}
-            src={typeof resolvedVideoUri === 'string' ? resolvedVideoUri : undefined}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            disablePictureInPicture
-            disableRemotePlayback
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              pointerEvents: 'none',
-              willChange: 'transform',
-              transform: 'translateZ(0)',
-              WebkitTransform: 'translateZ(0)',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-            } as any}
-          />
-        ) : (
+          resolvedVideoUri ? (
+            <video
+              ref={videoRef}
+              src={resolvedVideoUri}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              disablePictureInPicture
+              disableRemotePlayback
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                pointerEvents: 'none',
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+                WebkitTransform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              } as any}
+            />
+          ) : (
+            <LinearGradient
+              colors={['#071a2f', '#04101e', '#02060e']}
+              style={StyleSheet.absoluteFillObject}
+            />
+          )
+        ) : oceanVideoSource ? (
           <Video
             ref={videoRef}
             source={oceanVideoSource}
@@ -158,6 +176,11 @@ export const AtmosphericBackground: React.FC = () => {
             useNativeControls={false}
             progressUpdateIntervalMillis={1000}
             style={styles.videoPlayer}
+          />
+        ) : (
+          <LinearGradient
+            colors={['#071a2f', '#04101e', '#02060e']}
+            style={StyleSheet.absoluteFillObject}
           />
         )}
 

@@ -28,7 +28,7 @@ import {
   Globe,
   Radio,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 import { LocationSearchResult } from '../../../domain/models/location';
 import { mapRepository } from '../../../data/repositories/mapRepository';
 import { Coordinates } from '../../../domain/models/mapIntelligence';

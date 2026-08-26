@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 import { VarunaOrb } from '../brand/VarunaOrb';
 import { NavContourBackdrop } from './NavContourBackdrop';
 import { NavTabButton } from './NavTabButton';

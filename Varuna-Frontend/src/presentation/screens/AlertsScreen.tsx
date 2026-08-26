@@ -18,7 +18,7 @@ import {
   CheckCircle2,
   Clock,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../utils/haptics';
 import { Colors } from '../../theme/colors';
 import { Typography } from '../../theme/typography';
 import { telemetryService } from '../../data/services/telemetryService';

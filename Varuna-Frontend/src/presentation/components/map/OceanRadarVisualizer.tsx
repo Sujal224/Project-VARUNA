@@ -19,7 +19,7 @@ import Svg, {
   G,
 } from 'react-native-svg';
 import { CloudLightning, Fish } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '../../../utils/haptics';
 
 const { width } = Dimensions.get('window');
 
