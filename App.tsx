@@ -16,6 +16,7 @@ import {
 } from '@expo-google-fonts/playfair-display';
 import { Colors } from './src/theme/colors';
 import { BottomNavBar, TabType } from './src/presentation/components/navigation/BottomNavBar';
+import { AtmosphericBackground } from './src/presentation/components/brand/AtmosphericBackground';
 import { HomeScreen } from './src/presentation/screens/HomeScreen';
 import { MapScreen } from './src/presentation/screens/MapScreen';
 import { VarunaAiScreen } from './src/presentation/screens/VarunaAiScreen';
@@ -83,6 +84,9 @@ export default function App() {
     <SafeAreaProvider style={styles.container}>
       <StatusBar style="light" backgroundColor="#02060e" translucent />
       
+      {/* Persistent Global 60 FPS Atmospheric Video Background */}
+      <AtmosphericBackground />
+
       {/* Screen Content View */}
       <View style={styles.screenWrapper}>{renderCurrentScreen()}</View>
 

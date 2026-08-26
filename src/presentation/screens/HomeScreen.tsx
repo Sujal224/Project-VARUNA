@@ -28,7 +28,6 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { VarunaWordmark } from '../components/brand/VarunaWordmark';
-import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
 import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
@@ -80,7 +79,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <View style={styles.rootContainer}>
       <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
-      <AtmosphericBackground />
 
       <View style={styles.safeContainer}>
         {/* Top App Header with Apple-like Inset Precision */}
@@ -378,7 +376,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: '#02060e',
+    backgroundColor: 'transparent',
   },
   safeContainer: {
     flex: 1,

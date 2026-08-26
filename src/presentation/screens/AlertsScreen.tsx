@@ -21,7 +21,6 @@ import {
 import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { Typography } from '../../theme/typography';
-import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
 import { telemetryService } from '../../data/services/telemetryService';
 import { MarineAlert } from '../../domain/models/types';
 
@@ -82,7 +81,6 @@ export const AlertsScreen: React.FC = () => {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
-      <AtmosphericBackground />
 
       <View style={styles.safeContainer}>
         {/* Header with Apple-like Inset Precision */}
@@ -134,7 +132,7 @@ export const AlertsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#02060e',
+    backgroundColor: 'transparent',
   },
   safeContainer: {
     flex: 1,

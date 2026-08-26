@@ -25,7 +25,6 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '../../theme/colors';
 import { Typography } from '../../theme/typography';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
-import { AtmosphericBackground } from '../components/brand/AtmosphericBackground';
 import { aiService } from '../../data/services/aiService';
 import { ChatMessage } from '../../domain/models/types';
 
@@ -80,7 +79,6 @@ export const VarunaAiScreen: React.FC = () => {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
-      <AtmosphericBackground />
 
       <View style={styles.safeContainer}>
         {/* Top Header with Apple-like Inset Precision */}
@@ -200,7 +198,7 @@ export const VarunaAiScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#02060e',
+    backgroundColor: 'transparent',
   },
   safeContainer: {
     flex: 1,
