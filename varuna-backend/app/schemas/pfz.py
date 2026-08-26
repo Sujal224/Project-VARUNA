@@ -1,0 +1,7 @@
+"""
+PFZ Pydantic Schemas
+"""
+
+from typing import List, Optional
+from pydantic import BaseModel
+from app.schemas.map import PfzZoneFeature, Coordinates
