@@ -28,7 +28,7 @@ import * as Haptics from '../../utils/haptics';
 import { Colors } from '../../theme/colors';
 import { VarunaOrb } from '../components/brand/VarunaOrb';
 import { VarunaWordmark } from '../components/brand/VarunaWordmark';
-import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
+import { LiquidGlassWeatherCard } from '../components/weather/LiquidGlassWeatherCard';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
 import { QuickActionsRow } from '../components/common/QuickActionsRow';
@@ -57,7 +57,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const telemetry = useLiveTelemetry();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('pfz');
+  const [selectedFilter, setSelectedFilter] = useState('weather');
   const [explainModalVisible, setExplainModalVisible] = useState(false);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
 
@@ -124,7 +124,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const handleFilterPress = (filterId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedFilter(filterId);
-    if (filterId === 'pfz' || filterId === 'safe_route') {
+    if (filterId === 'map') {
       onNavigateTab('map');
     } else if (filterId === 'alerts') {
       onNavigateTab('alerts');
@@ -237,28 +237,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           >
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => handleFilterPress('pfz')}
-              style={[
-                styles.filterPill,
-                selectedFilter === 'pfz' && styles.filterPillActive,
-              ]}
-            >
-              <Fish
-                size={14}
-                color={selectedFilter === 'pfz' ? '#00e5ff' : '#8da2be'}
-              />
-              <Text
-                style={[
-                  styles.filterText,
-                  selectedFilter === 'pfz' && styles.filterTextActive,
-                ]}
-              >
-                PFZ
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
               onPress={() => handleFilterPress('weather')}
               style={[
                 styles.filterPill,
@@ -281,6 +259,28 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             <TouchableOpacity
               activeOpacity={0.8}
+              onPress={() => handleFilterPress('map')}
+              style={[
+                styles.filterPill,
+                selectedFilter === 'map' && styles.filterPillActive,
+              ]}
+            >
+              <Navigation
+                size={14}
+                color={selectedFilter === 'map' ? '#00e5ff' : '#8da2be'}
+              />
+              <Text
+                style={[
+                  styles.filterText,
+                  selectedFilter === 'map' && styles.filterTextActive,
+                ]}
+              >
+                Marine Map
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
               onPress={() => handleFilterPress('tides')}
               style={[
                 styles.filterPill,
@@ -297,29 +297,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   selectedFilter === 'tides' && styles.filterTextActive,
                 ]}
               >
-                Tides
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => handleFilterPress('safe_route')}
-              style={[
-                styles.filterPill,
-                selectedFilter === 'safe_route' && styles.filterPillActive,
-              ]}
-            >
-              <Navigation
-                size={14}
-                color={selectedFilter === 'safe_route' ? '#00e5ff' : '#8da2be'}
-              />
-              <Text
-                style={[
-                  styles.filterText,
-                  selectedFilter === 'safe_route' && styles.filterTextActive,
-                ]}
-              >
-                Safe Route
+                Tides & Swell
               </Text>
             </TouchableOpacity>
 
@@ -341,15 +319,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   selectedFilter === 'alerts' && styles.filterTextActive,
                 ]}
               >
-                Alerts
+                Live Alerts
               </Text>
             </TouchableOpacity>
           </ScrollView>
 
-          {/* Ocean Radar & Bathymetry Geospatial Visualizer Section */}
-          <OceanRadarVisualizer
-            onPressPfz={() => onNavigateTab('map')}
-            onPressCyclone={() => onNavigateTab('alerts')}
+          {/* Liquid Glass Weather & Marine Conditions Card with Alerts */}
+          <LiquidGlassWeatherCard
+            locationName={telemetry.locationName || 'Local Waters'}
+            regionName={telemetry.regionName}
+            isCustomLocation={telemetry.isCustomLocation}
+            conditions={telemetry.conditions}
+            weather={telemetry.weather}
+            alerts={telemetry.alerts}
+            onPressLocation={() => setLocationModalVisible(true)}
+            onPressAlerts={() => onNavigateTab('alerts')}
           />
 
           {/* Real-Time Conditions Master Liquid Glass Container */}

@@ -123,7 +123,7 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
         container: mapContainerRef.current,
         style: styleUrl,
         center: [centerLng, centerLat],
-        zoom: 8.5,
+        zoom: 10.2,
         pitch: 18, // Clean subtle tilt
         bearing: 0,
         attributionControl: false,
@@ -188,14 +188,16 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
   // 3. Update Camera when location or zoom changes
   useEffect(() => {
     if (mapInstanceRef.current && mapLoaded) {
+      const targetLng = selectedLocation.lng ?? centerLng;
+      const targetLat = selectedLocation.lat ?? centerLat;
       mapInstanceRef.current.flyTo({
-        center: [selectedLocation.lng || centerLng, selectedLocation.lat || centerLat],
-        zoom: 8.5 * zoomLevel,
+        center: [targetLng, targetLat],
+        zoom: 10.5 * zoomLevel,
         essential: true,
-        duration: 1000,
+        duration: 800,
       });
     }
-  }, [selectedLocation, zoomLevel, mapLoaded]);
+  }, [selectedLocation, zoomLevel, mapLoaded, centerLat, centerLng]);
 
   // 4. Inject Dynamic PFZ Polygons & Safe Routes into MapLibre GL
   useEffect(() => {
@@ -305,24 +307,27 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
-    // 1. User Vessel Command Beacon (Clean Glowing Navigation Beacon)
+    // 1. User Vessel Command Beacon (Focused GPS Location)
     const userMarkerEl = document.createElement('div');
     userMarkerEl.style.position = 'relative';
-    userMarkerEl.style.width = '36px';
-    userMarkerEl.style.height = '36px';
+    userMarkerEl.style.width = '42px';
+    userMarkerEl.style.height = '42px';
     userMarkerEl.style.cursor = 'pointer';
     userMarkerEl.style.display = 'flex';
     userMarkerEl.style.alignItems = 'center';
     userMarkerEl.style.justifyContent = 'center';
 
     userMarkerEl.innerHTML = `
-      <div style="position: absolute; width: 34px; height: 34px; border-radius: 50%; background: rgba(0, 229, 255, 0.18); border: 1px solid rgba(0, 229, 255, 0.5); animation: ping 2s infinite;"></div>
-      <div style="position: relative; width: 26px; height: 26px; border-radius: 50%; background: #081d33; border: 2px solid #00e5ff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px #00e5ff88;">
+      <div style="position: absolute; width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 229, 255, 0.22); border: 1.5px solid rgba(0, 229, 255, 0.6); animation: ping 2s infinite;"></div>
+      <div style="position: relative; width: 30px; height: 30px; border-radius: 50%; background: #081d33; border: 2.5px solid #00e5ff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px #00e5ffaa;">
         <div style="transform: rotate(${liveCourse}deg); display: flex; align-items: center; justify-content: center;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="#00e5ff" stroke="#00e5ff" stroke-width="1">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#00e5ff" stroke="#00e5ff" stroke-width="1.5">
             <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
           </svg>
         </div>
+      </div>
+      <div style="position: absolute; bottom: -18px; white-space: nowrap; background: rgba(0, 229, 255, 0.95); padding: 1px 6px; border-radius: 6px; font-size: 8.5px; font-weight: 700; color: #02060e; letter-spacing: 0.2px; box-shadow: 0 2px 6px rgba(0,0,0,0.5);">
+        YOU (GPS)
       </div>
     `;
 
@@ -333,7 +338,7 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
         type: 'vessel',
         name: 'Matsya Setu IV (Command)',
         region: 'Visakhapatnam Transit Channel',
-        coordinates: `${centerLat.toFixed(2)}°N, ${centerLng.toFixed(2)}°E`,
+        coordinates: `${centerLat.toFixed(4)}°N, ${centerLng.toFixed(4)}°E`,
         lat: centerLat,
         lng: centerLng,
         condition: `Safe Navigation (${liveSpeed} kts)`,
@@ -416,8 +421,8 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
       markersRef.current.push(marker);
     });
 
-    // 3. Moving AIS Vessel Chevrons (Clean Directional Ship Marker)
-    if (radarData?.vessels) {
+    // 3. Moving AIS Vessel Chevrons (Only displayed when the "AIS Fleet" layer is active!)
+    if (activeLayer === 'vessels' && radarData?.vessels) {
       radarData.vessels.forEach((vessel) => {
         const isDanger = vessel.collision_risk.level === 'DANGER';
         const isCaution = vessel.collision_risk.level === 'CAUTION';
@@ -494,7 +499,7 @@ export const VarunaMapLibreEngine: React.FC<VarunaMapLibreEngineProps> = ({
         markersRef.current.push(marker);
       });
     }
-  }, [mapIntel, radarData, mapLoaded]);
+  }, [mapIntel, radarData, mapLoaded, activeLayer, centerLat, centerLng, liveCourse, liveSpeed]);
 
   return (
     <View style={styles.mapContainer}>

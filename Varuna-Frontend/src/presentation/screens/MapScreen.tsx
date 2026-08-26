@@ -193,7 +193,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
       ],
     });
     setSheetVisible(true);
-    setZoomLevel(1.2);
+    setZoomLevel(1.0);
   };
 
   const handleZoomIn = () => {
@@ -308,7 +308,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
       ],
     });
     setSheetVisible(true);
-    setZoomLevel(1.25);
+    setZoomLevel(1.0);
   };
 
   const seaTemp = telemetry.conditions?.sea_temperature ?? 28.4;

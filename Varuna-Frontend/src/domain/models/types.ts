@@ -151,13 +151,13 @@ export interface AppNotification {
   title: string;
   body: string;
   type:
-    | 'Cyclone Warning'
-    | 'High Wave Warning'
-    | 'Strong Wind Warning'
-    | 'Route Hazard'
-    | 'Marine Alert'
-    | 'New PFZ Detected'
-    | 'System Alert';
+  | 'Cyclone Warning'
+  | 'High Wave Warning'
+  | 'Strong Wind Warning'
+  | 'Route Hazard'
+  | 'Marine Alert'
+  | 'New PFZ Detected'
+  | 'System Alert';
   severity: 'critical' | 'warning' | 'info' | 'success';
   timestamp: string;
   read: boolean;
