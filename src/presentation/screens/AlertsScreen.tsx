@@ -3,10 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   AlertTriangle,
   ShieldCheck,
@@ -24,6 +26,9 @@ import { telemetryService } from '../../data/services/telemetryService';
 import { MarineAlert } from '../../domain/models/types';
 
 export const AlertsScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
+
   const alerts = telemetryService.getAlerts();
 
   const renderAlertCard = (alert: MarineAlert) => {
@@ -76,11 +81,12 @@ export const AlertsScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
-      <SafeAreaView style={styles.safeArea}>
-        {/* Header */}
-        <View style={styles.topHeader}>
+      <View style={styles.safeContainer}>
+        {/* Header with Apple-like Inset Precision */}
+        <View style={[styles.topHeader, { paddingTop: topPadding }]}>
           <View>
             <Text style={styles.headerTitle}>Maritime Alert Center</Text>
             <Text style={styles.headerSubtitle}>
@@ -120,7 +126,7 @@ export const AlertsScreen: React.FC = () => {
           {/* List of Alerts */}
           {alerts.map((alert) => renderAlertCard(alert))}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -128,39 +134,43 @@ export const AlertsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
   },
-  safeArea: {
+  safeContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    zIndex: 50,
   },
   headerTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 20,
+    lineHeight: 25,
     color: '#ffffff',
+    letterSpacing: -0.2,
   },
   headerSubtitle: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 11,
-    color: Colors.onSurfaceVariant,
+    fontSize: 11.5,
+    lineHeight: 15,
+    color: '#8da2be',
     marginTop: 2,
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(52, 211, 153, 0.1)',
+    gap: 4,
+    backgroundColor: 'rgba(0, 230, 118, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(52, 211, 153, 0.3)',
+    borderColor: 'rgba(0, 230, 118, 0.25)',
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 9999,
+    paddingVertical: 4.5,
+    borderRadius: 20,
   },
   statusText: {
     fontFamily: 'Inter_600SemiBold',

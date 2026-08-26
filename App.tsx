@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts,
   Inter_400Regular,
@@ -79,7 +80,7 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
       <StatusBar style="light" backgroundColor="#02060e" translucent />
       
       {/* Screen Content View */}
@@ -90,7 +91,7 @@ export default function App() {
         currentTab={currentTab}
         onSelectTab={(tab) => setCurrentTab(tab)}
       />
-    </View>
+    </SafeAreaProvider>
   );
 }
 

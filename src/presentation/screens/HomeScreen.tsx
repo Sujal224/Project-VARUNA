@@ -6,10 +6,11 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   StatusBar,
   Image,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Bell,
   AudioWaveform as Waveform,
@@ -32,6 +33,7 @@ import { OceanRadarVisualizer } from '../components/map/OceanRadarVisualizer';
 import { ConditionMetricCard } from '../components/conditions/ConditionMetricCard';
 import { VarunaInsightCard } from '../components/insights/VarunaInsightCard';
 import { QuickActionsRow } from '../components/common/QuickActionsRow';
+import { ShinyText } from '../components/common/ShinyText';
 import { ExplainableAiModal } from '../components/insights/ExplainableAiModal';
 import { telemetryService } from '../../data/services/telemetryService';
 import { TabType } from '../components/navigation/BottomNavBar';
@@ -45,6 +47,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateTab,
   onAskAi,
 }) => {
+  const insets = useSafeAreaInsets();
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('pfz');
   const [explainModalVisible, setExplainModalVisible] = useState(false);
@@ -77,19 +82,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
-      <SafeAreaView style={styles.safeArea}>
-        {/* Top App Header */}
-        <View style={styles.topHeader}>
+      <View style={styles.safeContainer}>
+        {/* Top App Header with Apple-like Inset Precision */}
+        <View style={[styles.topHeader, { paddingTop: topPadding }]}>
           {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb & Exact Vector Wordmark */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={38} />
-            <VarunaWordmark scale={0.72} />
+            <VarunaOrb size={32} />
+            <VarunaWordmark scale={0.62} />
           </View>
 
           {/* Right: Offline Ready Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerActions}>
             <View style={styles.offlineReadyPill}>
-              <Waveform size={13} color="#00e676" />
+              <Waveform size={11} color="#00e676" />
               <Text style={styles.offlineReadyText}>Offline Ready</Text>
             </View>
 
@@ -98,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               onPress={() => onNavigateTab('alerts')}
               style={styles.headerIconButton}
             >
-              <Bell size={18} color="#e2edfd" />
+              <Bell size={16} color="#e2edfd" />
               <View style={styles.notificationDot} />
             </TouchableOpacity>
 
@@ -127,7 +132,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Text style={styles.heroHeadline}>
               Safer Seas.{'\n'}Smarter Decisions.
             </Text>
-            <Text style={styles.heroSubtext}>Your AI partner for the ocean.</Text>
+            <ShinyText
+              text="Your AI partner for the ocean."
+              fontSize={14}
+              fontFamily="Inter_500Medium"
+              baseColor="#8da2be"
+              shinyColor="#ffffff"
+              accentColor="#38bdf8"
+            />
           </View>
 
           {/* AI Search / Prompt Capsule (Liquid Glass Style) */}
@@ -358,7 +370,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           insight={primaryInsight}
           onClose={() => setExplainModalVisible(false)}
         />
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -368,65 +380,47 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#02060e',
   },
-  safeArea: {
+  safeContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    marginTop: 2,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    zIndex: 50,
   },
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-  },
-  brandTitleContainer: {
-    gap: 1,
-  },
-  brandName: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 15,
-    lineHeight: 18,
-    letterSpacing: 2.2,
-    color: '#ffffff',
-  },
-  brandTagline: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 7.5,
-    lineHeight: 9.5,
-    letterSpacing: 1.2,
-    color: '#8da2be',
-    opacity: 0.85,
+    gap: 8,
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   offlineReadyPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3.5,
     backgroundColor: 'rgba(0, 230, 118, 0.08)',
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.25)',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
+    paddingHorizontal: 7.5,
+    paddingVertical: 4.5,
     borderRadius: 9999,
   },
   offlineReadyText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: '#00e676',
   },
   headerIconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(8, 20, 38, 0.72)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -436,17 +430,17 @@ const styles = StyleSheet.create({
   },
   notificationDot: {
     position: 'absolute',
-    top: 7,
-    right: 8,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    top: 6,
+    right: 7,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: '#00e5ff',
   },
   avatarButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     overflow: 'hidden',

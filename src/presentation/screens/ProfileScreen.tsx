@@ -3,11 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Image,
+  StatusBar,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Ship,
   HardDrive,
@@ -26,23 +28,27 @@ import { AtmosphericBackground } from '../components/brand/AtmosphericBackground
 import { telemetryService } from '../../data/services/telemetryService';
 
 export const ProfileScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
+
   const vessel = telemetryService.getVessel();
   const offlineStatus = telemetryService.getOfflineStatus();
 
   return (
     <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
-      <SafeAreaView style={styles.safeArea}>
-        {/* Header */}
-        <View style={styles.topHeader}>
+      <View style={styles.safeContainer}>
+        {/* Header with Apple-like Inset Precision */}
+        <View style={[styles.topHeader, { paddingTop: topPadding }]}>
           <Text style={styles.headerTitle}>Vessel & Offline System</Text>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
             style={styles.settingsButton}
           >
-            <Settings size={18} color={Colors.onSurface} />
+            <Settings size={17} color={Colors.onSurface} />
           </TouchableOpacity>
         </View>
 
@@ -179,7 +185,7 @@ export const ProfileScreen: React.FC = () => {
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -187,28 +193,33 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
   },
-  safeArea: {
+  safeContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    zIndex: 50,
   },
   headerTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 16,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 20,
+    lineHeight: 25,
     color: '#ffffff',
+    letterSpacing: -0.2,
   },
   settingsButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(28, 43, 60, 0.5)',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(28, 43, 60, 0.65)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },

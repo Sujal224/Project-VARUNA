@@ -3,14 +3,15 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   Dimensions,
   ScrollView,
   StatusBar,
   Image,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Search,
   SlidersHorizontal,
@@ -65,6 +66,9 @@ const DEFAULT_LOCATION: MapMarkerLocation = {
 };
 
 export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
+  const insets = useSafeAreaInsets();
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeControlTab, setActiveControlTab] = useState<MapControlTab>('layers');
   const [selectedLocation, setSelectedLocation] = useState<MapMarkerLocation>(DEFAULT_LOCATION);
@@ -95,19 +99,19 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
       <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
-      <SafeAreaView style={styles.safeArea}>
-        {/* Top Header - Exact Brand Design */}
-        <View style={styles.topHeader}>
+      <View style={styles.safeContainer}>
+        {/* Top Header - Exact Brand Design with Luxury Clearance */}
+        <View style={[styles.topHeader, { paddingTop: topPadding }]}>
           {/* Left: Brand Identity with Glowing Liquid Glass Varuna Orb & Exact Vector Wordmark */}
           <View style={styles.brandGroup}>
-            <VarunaOrb size={38} />
-            <VarunaWordmark scale={0.72} />
+            <VarunaOrb size={32} />
+            <VarunaWordmark scale={0.62} />
           </View>
 
           {/* Right: GPS Locked Status Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerRightActions}>
             <View style={styles.statusPill}>
-              <Crosshair size={12} color="#00e5ff" />
+              <Crosshair size={11} color="#00e5ff" />
               <Text style={styles.statusText}>GPS Locked</Text>
             </View>
 
@@ -119,7 +123,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
               }}
               style={styles.headerIconButton}
             >
-              <Bell size={18} color="#e2edfd" />
+              <Bell size={16} color="#e2edfd" />
               <View style={styles.notificationDot} />
             </TouchableOpacity>
 
@@ -204,7 +208,7 @@ export const MapScreen: React.FC<MapScreenProps> = ({ onNavigateTab }) => {
             </View>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -214,49 +218,48 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#02060e',
   },
-  safeArea: {
+  safeContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: 14,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
     zIndex: 50,
   },
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   headerRightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3.5,
     backgroundColor: 'rgba(0, 229, 255, 0.08)',
     borderWidth: 1,
     borderColor: 'rgba(0, 229, 255, 0.25)',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    paddingHorizontal: 7.5,
+    paddingVertical: 4.5,
     borderRadius: 20,
   },
   statusText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 9.5,
+    fontSize: 8.5,
     color: '#00e5ff',
     letterSpacing: 0.2,
   },
   headerIconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(8, 20, 38, 0.72)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -266,17 +269,17 @@ const styles = StyleSheet.create({
   },
   notificationDot: {
     position: 'absolute',
-    top: 7,
-    right: 8,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    top: 6,
+    right: 7,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: '#00e5ff',
   },
   avatarButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     overflow: 'hidden',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import Svg, { Path, G, Defs, Filter, FeDropShadow, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 
 interface VarunaWordmarkProps {
   scale?: number;
@@ -9,6 +9,7 @@ interface VarunaWordmarkProps {
   showTagline?: boolean;
   tagline?: string;
   glow?: boolean;
+  taglineOffsetLeft?: number;
 }
 
 /**
@@ -22,6 +23,7 @@ export const VarunaWordmark: React.FC<VarunaWordmarkProps> = ({
   showTagline = true,
   tagline = 'MARINE INTELLIGENCE',
   glow = true,
+  taglineOffsetLeft = 24,
 }) => {
   // Base SVG dimensions
   const baseWidth = 210;
@@ -87,16 +89,25 @@ export const VarunaWordmark: React.FC<VarunaWordmarkProps> = ({
         </G>
       </Svg>
 
-      {/* 2. Subline: "MARINE INTELLIGENCE" with expanded tracking */}
+      {/* 2. Subline: "MARINE INTELLIGENCE" shifted right beneath VARUNA */}
       {showTagline && (
-        <View style={[styles.taglineContainer, { width: targetWidth }]}>
+        <View
+          style={[
+            styles.taglineContainer,
+            {
+              width: targetWidth,
+              paddingLeft: taglineOffsetLeft * scale,
+            },
+          ]}
+        >
           <Text
+            numberOfLines={1}
             style={[
               styles.taglineText,
               {
                 color: subtextColor,
-                fontSize: 8.2 * scale,
-                letterSpacing: 3.6 * scale,
+                fontSize: Math.max(6.8, 10.5 * scale),
+                letterSpacing: Math.max(1.6, 2.6 * scale),
               },
             ]}
           >
@@ -117,13 +128,12 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   taglineContainer: {
-    marginTop: 3,
-    paddingLeft: 1.5,
+    marginTop: 2.5,
   },
   taglineText: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_700Bold',
     lineHeight: 11,
-    opacity: 0.9,
+    opacity: 0.92,
     textAlign: 'left',
   },
 });

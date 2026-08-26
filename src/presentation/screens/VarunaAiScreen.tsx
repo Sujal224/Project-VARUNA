@@ -3,13 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TextInput,
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Send,
   Sparkles,
@@ -43,6 +44,9 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 ];
 
 export const VarunaAiScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const topPadding = Math.max(insets.top, Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 0) + 6;
+
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -75,13 +79,14 @@ export const VarunaAiScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="#02060e" translucent />
       <AtmosphericBackground />
 
-      <SafeAreaView style={styles.safeArea}>
-        {/* Top Header */}
-        <View style={styles.topHeader}>
+      <View style={styles.safeContainer}>
+        {/* Top Header with Apple-like Inset Precision */}
+        <View style={[styles.topHeader, { paddingTop: topPadding }]}>
           <View style={styles.headerLeft}>
-            <VarunaOrb size={32} />
+            <VarunaOrb size={30} />
             <View>
               <Text style={styles.headerTitle}>VARUNA AI</Text>
               <Text style={styles.headerSubtitle}>Maritime Decision Intelligence</Text>
@@ -187,7 +192,7 @@ export const VarunaAiScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };
@@ -195,19 +200,20 @@ export const VarunaAiScreen: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#051424',
+    backgroundColor: '#02060e',
   },
-  safeArea: {
+  safeContainer: {
     flex: 1,
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+    zIndex: 50,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -215,37 +221,40 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   headerTitle: {
-    fontFamily: 'Inter_600SemiBold',
-    fontSize: 15,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 16,
+    lineHeight: 20,
     color: '#ffffff',
+    letterSpacing: 0.2,
   },
   headerSubtitle: {
     fontFamily: 'Inter_400Regular',
-    fontSize: 10,
+    fontSize: 10.5,
+    lineHeight: 14,
     color: Colors.onSurfaceVariant,
+    marginTop: 1,
   },
   onlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(52, 211, 153, 0.1)',
+    backgroundColor: 'rgba(0, 229, 255, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(52, 211, 153, 0.25)',
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 9999,
+    borderColor: 'rgba(0, 229, 255, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
   },
   onlineDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.success,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#00e5ff',
   },
   onlineText: {
-    fontFamily: 'Inter_500Medium',
-    fontSize: 9,
-    color: Colors.success,
-    textTransform: 'uppercase',
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 9.5,
+    color: '#00e5ff',
   },
   chatScroll: {
     flex: 1,
