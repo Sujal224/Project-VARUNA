@@ -7,8 +7,10 @@
 
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../common/responses/apiResponse';
+import marineRoutes from '../modules/marine/marine.routes';
 
 export const apiRouter = Router();
+apiRouter.use('/marine', marineRoutes);
 
 /**
  * GET /api/v1/health
