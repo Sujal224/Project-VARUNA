@@ -14,8 +14,6 @@ import Svg, {
   RadialGradient,
   LinearGradient as SvgLinearGradient,
   Stop,
-  G,
-  ClipPath,
 } from 'react-native-svg';
 
 export interface VarunaOrbProps {
@@ -36,12 +34,15 @@ export interface VarunaOrbProps {
 }
 
 /**
- * VarunaOrb - Pure Liquid Glass Sphere with Bioluminescent Horizon Wave.
- * Matches the deep obsidian studio glass reference design:
- * - Deep dark obsidian spherical void
- * - Brilliant luminous electric cyan & pure white plasma sine wave
- * - Studio softbox crescent specular glaze on top dome
- * - High-index razor neon cyan Fresnel reflection rim
+ * VarunaOrb - Apple-level Pure Liquid Glass Sphere with Fluid Horizon Wave.
+ *
+ * Engineered with:
+ * - Seamless 60/120 FPS continuous linear flow propagation (zero seams, zero hitch)
+ * - Harmonic secondary counter-wave for rich liquid refraction depth
+ * - Gentle ocean swell vertical respiration (subtle tidal float)
+ * - 4-layer bioluminescent plasma wave (brilliant white laser core + electric cyan & cobalt corona)
+ * - Studio softbox crescent specular highlight & double Fresnel razor rims
+ * - 100% Native Driver hardware acceleration
  */
 export const VarunaOrb: React.FC<VarunaOrbProps> = ({
   size = 58,
@@ -52,18 +53,25 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
   style,
   onPress,
 }) => {
+  // Native Driver Animation Controllers
   const flowAnim = useRef(new Animated.Value(0)).current;
+  const secondaryFlowAnim = useRef(new Animated.Value(0)).current;
+  const swellAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(0)).current;
 
-  const flowDuration = speed === 'fast' ? 4500 : speed === 'slow' ? 12000 : 7500;
+  // Durations tuned for silky, hypnotic, luxury marine flow
+  const flowDuration = speed === 'fast' ? 3800 : speed === 'slow' ? 10000 : 6000;
 
   useEffect(() => {
     if (!active) {
       flowAnim.setValue(0);
+      secondaryFlowAnim.setValue(0);
+      swellAnim.setValue(0.5);
       pulseAnim.setValue(0.5);
       return;
     }
 
+    // 1. Primary continuous flowing wave (smooth linear loop)
     const primaryFlowLoop = Animated.loop(
       Animated.timing(flowAnim, {
         toValue: 1,
@@ -73,17 +81,46 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
       })
     );
 
+    // 2. Secondary counter-harmonic wave (smooth liquid depth)
+    const secondaryFlowLoop = Animated.loop(
+      Animated.timing(secondaryFlowAnim, {
+        toValue: 1,
+        duration: flowDuration * 1.38,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+
+    // 3. Subtle vertical ocean swell displacement
+    const swellLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(swellAnim, {
+          toValue: 1,
+          duration: 4200,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(swellAnim, {
+          toValue: 0,
+          duration: 4200,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    // 4. Volumetric ambient breathing pulse
     const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 3600,
+          duration: 3200,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 0,
-          duration: 3600,
+          duration: 3200,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
@@ -91,43 +128,70 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
     );
 
     primaryFlowLoop.start();
+    secondaryFlowLoop.start();
+    swellLoop.start();
     pulseLoop.start();
 
     return () => {
       primaryFlowLoop.stop();
+      secondaryFlowLoop.stop();
+      swellLoop.stop();
       pulseLoop.stop();
     };
-  }, [active, flowDuration, flowAnim, pulseAnim]);
+  }, [active, flowDuration, flowAnim, secondaryFlowAnim, swellAnim, pulseAnim]);
 
-  // Primary wave translation: translates 1 full period
+  // Primary wave translation: translates exactly 1 full period (size pixels = 200 SVG coordinate units)
   const primaryWaveTranslateX = flowAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -size],
   });
 
+  // Secondary harmonic wave translation (counter-current flow)
+  const secondaryWaveTranslateX = secondaryFlowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-size, 0],
+  });
+
+  // Vertical ocean swell displacement
+  const waveTranslateY = swellAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-1.4, 1.4],
+  });
+
+  // Ambient corona pulse
   const glowOpacity = pulseAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.6 * intensity, 0.95 * intensity],
+    outputRange: [0.65 * intensity, 1.0 * intensity],
   });
 
   const glowScale = pulseAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.97, 1.05],
+    outputRange: [0.97, 1.06],
   });
 
   const borderRadius = size / 2;
-  const glowSize = size * 1.35;
+  const glowSize = size * 1.36;
 
-  // Continuous seamless sine wave across 6 periodic cycles (-400 to 800)
-  // Wavelength = 200 coordinate units. Crest at x+50 (y=65), Trough at x+150 (y=135)
-  const wavePath =
+  // Seamless continuous primary wave paths across 6 periodic cycles (-400 to 800)
+  // Wavelength = 200 coordinate units. Crest at x+50 (y=62), Trough at x+150 (y=138)
+  const primaryWavePath =
     'M -400 100 ' +
-    'C -365 60, -335 60, -300 100 C -265 140, -235 140, -200 100 ' +
-    'C -165 60, -135 60, -100 100 C -65 140, -35 140, 0 100 ' +
-    'C 35 60, 65 60, 100 100 C 135 140, 165 140, 200 100 ' +
-    'C 235 60, 265 60, 300 100 C 335 140, 365 140, 400 100 ' +
-    'C 435 60, 465 60, 500 100 C 535 140, 565 140, 600 100 ' +
-    'C 635 60, 665 60, 700 100 C 735 140, 765 140, 800 100';
+    'C -365 62, -335 62, -300 100 C -265 138, -235 138, -200 100 ' +
+    'C -165 62, -135 62, -100 100 C -65 138, -35 138, 0 100 ' +
+    'C 35 62, 65 62, 100 100 C 135 138, 165 138, 200 100 ' +
+    'C 235 62, 265 62, 300 100 C 335 138, 365 138, 400 100 ' +
+    'C 435 62, 465 62, 500 100 C 535 138, 565 138, 600 100 ' +
+    'C 635 62, 665 62, 700 100 C 735 138, 765 138, 800 100';
+
+  // Harmonic secondary counter-wave (shallower amplitude for liquid optical depth)
+  const secondaryWavePath =
+    'M -400 100 ' +
+    'C -365 78, -335 78, -300 100 C -265 122, -235 122, -200 100 ' +
+    'C -165 78, -135 78, -100 100 C -65 122, -35 122, 0 100 ' +
+    'C 35 78, 65 78, 100 100 C 135 122, 165 122, 200 100 ' +
+    'C 235 78, 265 78, 300 100 C 335 122, 365 122, 400 100 ' +
+    'C 435 78, 465 78, 500 100 C 535 122, 565 122, 600 100 ' +
+    'C 635 78, 665 78, 700 100 C 735 122, 765 122, 800 100';
 
   const ContainerComponent = onPress ? TouchableOpacity : View;
 
@@ -169,8 +233,8 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
                 fx="50%"
                 fy="50%"
               >
-                <Stop offset="0%" stopColor="#00e5ff" stopOpacity="0.5" />
-                <Stop offset="35%" stopColor="#0066ff" stopOpacity="0.3" />
+                <Stop offset="0%" stopColor="#00e5ff" stopOpacity="0.55" />
+                <Stop offset="35%" stopColor="#0066ff" stopOpacity="0.32" />
                 <Stop offset="70%" stopColor="#001855" stopOpacity="0.1" />
                 <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
               </RadialGradient>
@@ -234,10 +298,6 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
               <Stop offset="50%" stopColor="#0055ff" stopOpacity="0.1" />
               <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
             </SvgLinearGradient>
-
-            <ClipPath id="sphereInnerClip">
-              <Circle cx="100" cy="100" r="96" />
-            </ClipPath>
           </Defs>
 
           {/* Deep Dark Obsidian Body */}
@@ -251,7 +311,10 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
             {
               width: size * 5,
               height: size,
-              transform: [{ translateX: primaryWaveTranslateX }],
+              transform: [
+                { translateX: primaryWaveTranslateX },
+                { translateY: waveTranslateY },
+              ],
             },
           ]}
         >
@@ -263,9 +326,9 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
           >
             {/* Wave Glow Layer 1: Sapphire Bloom */}
             <Path
-              d={wavePath}
+              d={primaryWavePath}
               fill="none"
-              stroke="#0044ff"
+              stroke="#003cd6"
               strokeWidth="24"
               strokeOpacity="0.4"
               strokeLinecap="round"
@@ -273,9 +336,9 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
 
             {/* Wave Glow Layer 2: Vivid Azure Core */}
             <Path
-              d={wavePath}
+              d={primaryWavePath}
               fill="none"
-              stroke="#0099ff"
+              stroke="#0088ff"
               strokeWidth="14"
               strokeOpacity="0.75"
               strokeLinecap="round"
@@ -283,7 +346,7 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
 
             {/* Wave Glow Layer 3: Electric Cyan Plasma Core */}
             <Path
-              d={wavePath}
+              d={primaryWavePath}
               fill="none"
               stroke="#00f0ff"
               strokeWidth="6.5"
@@ -293,7 +356,7 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
 
             {/* Wave Glow Layer 4: Laser White Central Thread */}
             <Path
-              d={wavePath}
+              d={primaryWavePath}
               fill="none"
               stroke="#ffffff"
               strokeWidth="2.8"
@@ -303,7 +366,47 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
           </Svg>
         </Animated.View>
 
-        {/* 4. Pure Liquid Glass Surface Optics (Specular Crescent + Fresnel Rim) */}
+        {/* 4. Secondary Harmonic Counter-Wave (Liquid Depth) */}
+        <Animated.View
+          style={[
+            styles.flowingWaveContainer,
+            {
+              width: size * 5,
+              height: size,
+              opacity: 0.45,
+              transform: [
+                { translateX: secondaryWaveTranslateX },
+                { translateY: waveTranslateY },
+              ],
+            },
+          ]}
+        >
+          <Svg
+            width={size * 5}
+            height={size}
+            viewBox="0 0 1000 200"
+            style={styles.svgFill}
+          >
+            <Path
+              d={secondaryWavePath}
+              fill="none"
+              stroke="#0066ff"
+              strokeWidth="8"
+              strokeOpacity="0.45"
+              strokeLinecap="round"
+            />
+            <Path
+              d={secondaryWavePath}
+              fill="none"
+              stroke="#55ddff"
+              strokeWidth="2.2"
+              strokeOpacity="0.8"
+              strokeLinecap="round"
+            />
+          </Svg>
+        </Animated.View>
+
+        {/* 5. Pure Liquid Glass Surface Optics (Specular Crescent + Fresnel Rim) */}
         <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
           <Svg width={size} height={size} viewBox="0 0 200 200">
             {/* Top Softbox Specular Highlight Crescent */}
@@ -335,7 +438,7 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
               r="95"
               fill="none"
               stroke="#00e5ff"
-              strokeWidth="2.5"
+              strokeWidth={2.5}
               strokeOpacity="0.9"
             />
 
@@ -346,7 +449,7 @@ export const VarunaOrb: React.FC<VarunaOrbProps> = ({
               r="92"
               fill="none"
               stroke="#0066ff"
-              strokeWidth="1.2"
+              strokeWidth={1.2}
               strokeOpacity="0.6"
             />
           </Svg>

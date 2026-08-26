@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,8 +10,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { VarunaOrb } from '../brand/VarunaOrb';
 import { NavContourBackdrop } from './NavContourBackdrop';
-import { NavLaserIndicator } from './NavLaserIndicator';
-import { NavTabButton, TabId } from './NavTabButton';
+import { NavTabButton } from './NavTabButton';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -29,14 +28,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   // Fluid responsive width: full pill with comfortable horizontal margins
   const navWidth = Math.min(screenWidth - 24, 430);
   const navHeight = 88; // Total canvas height including raised center dome
-
-  // Track the center X of each tab for the sliding laser beam
-  const [tabPositions, setTabPositions] = useState<{ [key in TabId]?: number }>({
-    home: navWidth * 0.13,
-    map: navWidth * 0.31,
-    alerts: navWidth * 0.69,
-    profile: navWidth * 0.87,
-  });
 
   // Center Orb touch spring controller
   const orbScaleAnim = useRef(new Animated.Value(1)).current;
@@ -85,26 +76,12 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
     onSelectTab('ai');
   };
 
-  // Determine active indicator position
-  const activeTabId = currentTab !== 'ai' ? (currentTab as TabId) : undefined;
-  const targetIndicatorX = activeTabId && tabPositions[activeTabId] !== undefined
-    ? tabPositions[activeTabId]!
-    : navWidth / 2;
-
-  const isIndicatorVisible = currentTab !== 'ai';
-
   return (
     <View style={[styles.floatingWrapper, { width: navWidth }]}>
       {/* 1. Precision Contoured Glass Backdrop (Monolithic Center Dome & Grazing Rim) */}
       <NavContourBackdrop width={navWidth} height={navHeight} />
 
-      {/* 2. Sliding Electric Laser Beam Active Indicator */}
-      <NavLaserIndicator
-        targetX={targetIndicatorX}
-        visible={isIndicatorVisible}
-      />
-
-      {/* 3. Tab Navigation Items Container */}
+      {/* 2. Tab Navigation Items Container */}
       <View style={[styles.tabContentBar, { width: navWidth }]}>
         {/* Left Tab 1: Home */}
         <View style={styles.tabColumn}>
@@ -113,10 +90,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             label="Home"
             isActive={currentTab === 'home'}
             onPress={() => handleTabPress('home')}
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              setTabPositions((prev) => ({ ...prev, home: x + width / 2 }));
-            }}
           />
         </View>
 
@@ -127,14 +100,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             label="Map"
             isActive={currentTab === 'map'}
             onPress={() => handleTabPress('map')}
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              setTabPositions((prev) => ({ ...prev, map: x + width / 2 }));
-            }}
           />
         </View>
 
-        {/* Center Raised Signature VARUNA Orb (AI Core) */}
+        {/* Center Raised Signature VARUNA Orb (Concentrically Nested in Center Dome) */}
         <View style={styles.centerOrbAnchor}>
           <TouchableWithoutFeedback
             onPressIn={handleOrbPressIn}
@@ -153,7 +122,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               ]}
             >
               <VarunaOrb
-                size={60}
+                size={58}
                 active={true}
                 speed={currentTab === 'ai' ? 'fast' : 'normal'}
                 intensity={currentTab === 'ai' ? 1.35 : 1.0}
@@ -171,10 +140,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             isActive={currentTab === 'alerts'}
             hasBadge={true}
             onPress={() => handleTabPress('alerts')}
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              setTabPositions((prev) => ({ ...prev, alerts: x + width / 2 }));
-            }}
           />
         </View>
 
@@ -185,10 +150,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
             label="Profile"
             isActive={currentTab === 'profile'}
             onPress={() => handleTabPress('profile')}
-            onLayout={(e) => {
-              const { x, width } = e.nativeEvent.layout;
-              setTabPositions((prev) => ({ ...prev, profile: x + width / 2 }));
-            }}
           />
         </View>
       </View>
@@ -211,7 +172,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
     position: 'relative',
     zIndex: 5,
   },
@@ -221,16 +182,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerOrbAnchor: {
-    width: 66,
-    height: 66,
+    width: 68,
+    height: 68,
     alignItems: 'center',
     justifyContent: 'center',
-    top: -9, // Elevates the orb symmetrically into the center dome
+    top: -19, // Concentrically positions orb center at y=35 inside the raised dome
     zIndex: 10,
   },
   orbTouchContainer: {
-    width: 64,
-    height: 64,
+    width: 58,
+    height: 58,
     alignItems: 'center',
     justifyContent: 'center',
   },

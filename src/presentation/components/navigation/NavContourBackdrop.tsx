@@ -83,14 +83,14 @@ export const NavContourBackdrop: React.FC<NavContourBackdropProps> = ({
             <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </SvgLinearGradient>
 
-          {/* 4. Center Dome Ambient Radial Blue Glow */}
+          {/* 4. Center Dome Ambient Radial Blue Glow (Concentric at cy = 35) */}
           <RadialGradient
             id="centerDomeAmbientGlow"
             cx="50%"
             cy="40%"
             r="45%"
             fx="50%"
-            fy="30%"
+            fy="35%"
           >
             <Stop offset="0%" stopColor="#0088ff" stopOpacity="0.22" />
             <Stop offset="60%" stopColor="#0033aa" stopOpacity="0.08" />
@@ -123,26 +123,26 @@ export const NavContourBackdrop: React.FC<NavContourBackdropProps> = ({
             fill="url(#upperSheenGrad)"
           />
 
-          {/* Center Dome Radiant Ambient Blue Light Pool */}
+          {/* Center Dome Radiant Ambient Blue Light Pool (Concentric at cy = 35) */}
           <Circle
             cx={cx}
-            cy={38}
-            r={52}
+            cy={35}
+            r={50}
             fill="url(#centerDomeAmbientGlow)"
           />
 
-          {/* Center Orb Socket Recess (Deep circular shadow behind the orb) */}
+          {/* Center Orb Socket Recess (Concentric at cy = 35) */}
           <Circle
             cx={cx}
-            cy={42}
-            r={33}
+            cy={35}
+            r={31}
             fill="#01040b"
-            fillOpacity={0.8}
+            fillOpacity={0.75}
           />
           <Circle
             cx={cx}
-            cy={42}
-            r={33}
+            cy={35}
+            r={31}
             fill="none"
             stroke="#0066ff"
             strokeWidth={1}
