@@ -4,7 +4,7 @@
 
 VARUNA transforms complex oceanographic telemetry (Potential Fishing Zones, bathymetric contours, wave currents, sea surface temperature, chlorophyll concentration, cyclone paths) into calm, explainable AI intelligence.
 
-Built for Android with **React Native**, **Expo**, and **TypeScript**, directly translating the visual specifications and design language from Google Stitch MCP.
+Built for Android with **React Native**, **Expo**, and **TypeScript**, directly translating the visual specifications and design language from Google Stitch and Framer.
 
 ---
 
