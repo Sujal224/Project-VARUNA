@@ -53,9 +53,89 @@ def format_coordinates_dms(lat: float, lon: float) -> str:
     return f"{abs(lat):.2f}°{lat_dir}, {abs(lon):.2f}°{lon_dir}"
 
 
+def get_nearest_ocean(lat: float, lon: float) -> str:
+    """
+    Identify the nearest major ocean or sea body based on coordinates.
+    Returns a human-friendly name like 'Bay of Bengal', 'Arabian Sea', 'Pacific Ocean'.
+    """
+    # === Indian Subcontinent Coastal Seas ===
+    # Bay of Bengal (eastern coast of India + Sri Lanka + Bangladesh + Myanmar)
+    if 0.0 <= lat <= 23.0 and 77.0 <= lon <= 100.0:
+        return "Bay of Bengal"
+    # Arabian Sea (western coast of India + Pakistan + Oman)
+    if 0.0 <= lat <= 25.0 and 50.0 <= lon < 77.0:
+        return "Arabian Sea"
+    # Andaman Sea
+    if 4.0 <= lat <= 20.0 and 92.0 <= lon <= 100.0:
+        return "Andaman Sea"
+    # Laccadive Sea (between India, Maldives, Sri Lanka)
+    if 0.0 <= lat <= 14.0 and 70.0 <= lon <= 80.0:
+        return "Laccadive Sea"
+
+    # === Mediterranean & European Seas ===
+    if 30.0 <= lat <= 46.0 and -6.0 <= lon <= 36.0:
+        return "Mediterranean Sea"
+    if 54.0 <= lat <= 62.0 and -4.0 <= lon <= 12.0:
+        return "North Sea"
+    if 53.0 <= lat <= 66.0 and 12.0 <= lon <= 30.0:
+        return "Baltic Sea"
+    if 40.0 <= lat <= 47.0 and 27.0 <= lon <= 42.0:
+        return "Black Sea"
+
+    # === Middle East & African Seas ===
+    if 12.0 <= lat <= 30.0 and 32.0 <= lon <= 44.0:
+        return "Red Sea"
+    if 23.0 <= lat <= 30.5 and 46.0 <= lon <= 57.0:
+        return "Persian Gulf"
+    if -12.0 <= lat <= 12.0 and 38.0 <= lon <= 52.0:
+        return "Gulf of Aden"
+
+    # === East Asian Seas ===
+    if 0.0 <= lat <= 23.0 and 99.0 <= lon <= 120.0:
+        return "South China Sea"
+    if 23.0 <= lat <= 41.0 and 117.0 <= lon <= 132.0:
+        return "East China Sea"
+    if 33.0 <= lat <= 52.0 and 127.0 <= lon <= 143.0:
+        return "Sea of Japan"
+    if -12.0 <= lat <= 8.0 and 95.0 <= lon <= 141.0:
+        return "Java Sea"
+
+    # === Americas ===
+    if 9.0 <= lat <= 28.0 and -90.0 <= lon <= -60.0:
+        return "Caribbean Sea"
+    if 18.0 <= lat <= 31.0 and -100.0 <= lon <= -80.0:
+        return "Gulf of Mexico"
+
+    # === Major Oceans (broad catch-all) ===
+    # Indian Ocean
+    if -60.0 <= lat <= 30.0 and 20.0 <= lon <= 120.0:
+        return "Indian Ocean"
+    # North Pacific
+    if 0.0 <= lat <= 60.0 and (120.0 <= lon <= 180.0 or -180.0 <= lon <= -100.0):
+        return "North Pacific Ocean"
+    # South Pacific
+    if -60.0 <= lat < 0.0 and (120.0 <= lon <= 180.0 or -180.0 <= lon <= -70.0):
+        return "South Pacific Ocean"
+    # North Atlantic
+    if 0.0 <= lat <= 60.0 and -100.0 <= lon <= 0.0:
+        return "North Atlantic Ocean"
+    # South Atlantic
+    if -60.0 <= lat < 0.0 and -70.0 <= lon <= 20.0:
+        return "South Atlantic Ocean"
+    # Arctic
+    if lat > 60.0:
+        return "Arctic Ocean"
+    # Southern / Antarctic
+    if lat < -60.0:
+        return "Southern Ocean"
+
+    return "Open Ocean"
+
+
 def get_marine_region_name(lat: float, lon: float) -> str:
     """
     Identify precise oceanic or coastal marine sector based on coordinates.
+    Provides granular region names for Indian waters, falls back to nearest ocean globally.
     """
     # Visakhapatnam & Northern Andhra Coast
     if 16.5 <= lat <= 18.5 and 82.0 <= lon <= 85.0:
@@ -84,11 +164,12 @@ def get_marine_region_name(lat: float, lon: float) -> str:
     # Tamil Nadu / Palk Strait
     elif 8.5 <= lat <= 11.5 and 78.0 <= lon <= 80.0:
         return "Gulf of Mannar & Palk Bay"
-    # General Arabian Sea
-    elif lon < 77.0 and 0.0 <= lat <= 25.0:
-        return "Arabian Sea Oceanic Sector"
-    # General Bay of Bengal
-    elif lon >= 77.0 and 0.0 <= lat <= 25.0:
-        return "Bay of Bengal Marine Sector"
+    # Andaman & Nicobar
+    elif 6.0 <= lat <= 14.0 and 91.0 <= lon <= 95.0:
+        return "Andaman & Nicobar Marine Basin"
+    # Lakshadweep
+    elif 8.0 <= lat <= 12.5 and 71.0 <= lon <= 74.5:
+        return "Lakshadweep Sea"
     else:
-        return f"Sector {abs(lat):.1f}°{ 'N' if lat>=0 else 'S' }, {abs(lon):.1f}°{ 'E' if lon>=0 else 'W' }"
+        # Fall back to global ocean detection
+        return get_nearest_ocean(lat, lon)

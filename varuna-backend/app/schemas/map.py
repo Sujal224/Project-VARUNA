@@ -150,6 +150,8 @@ class MapIntelligenceRequest(BaseModel):
 
 class MapIntelligenceResponse(BaseModel):
     user_location: Coordinates
+    region_name: str
+    nearest_ocean: str
     conditions: MarineConditions
     weather: WeatherIntelligence
     pfz: PfzIntelligence
@@ -157,3 +159,4 @@ class MapIntelligenceResponse(BaseModel):
     safe_routes: List[SafeRoute]
     alerts: List[MapAlertItem]
     recommendation: Optional[MapRecommendation] = None
+

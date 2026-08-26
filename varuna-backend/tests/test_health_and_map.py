@@ -43,6 +43,8 @@ def test_map_intelligence_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert "user_location" in data
+    assert "region_name" in data
+    assert "nearest_ocean" in data
     assert "conditions" in data
     assert "weather" in data
     assert "pfz" in data
@@ -50,7 +52,10 @@ def test_map_intelligence_endpoint():
     assert "safe_routes" in data
     assert "alerts" in data
     assert len(data["pfz"]["zones"]) >= 1
-    print("[PASS] Map intelligence endpoint test passed")
+    # Verify ocean detection for Visakhapatnam coordinates
+    assert "Visakhapatnam" in data["region_name"] or "Andhra" in data["region_name"]
+    assert data["nearest_ocean"] == "Bay of Bengal"
+    print(f"[PASS] Map intelligence endpoint test passed (region={data['region_name']}, ocean={data['nearest_ocean']})")
 
 
 def test_search_locations_endpoint():
