@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "VARUNA",
+    "slug": "project-varuna",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#02060e",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#02060e"
+      },
+      "package": "com.varuna.marineintelligence",
+      "edgeToEdgeEnabled": true
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "node_modules/@expo-google-fonts/inter/Inter_400Regular.ttf",
+            "node_modules/@expo-google-fonts/inter/Inter_500Medium.ttf",
+            "node_modules/@expo-google-fonts/inter/Inter_600SemiBold.ttf",
+            "node_modules/@expo-google-fonts/inter/Inter_700Bold.ttf",
+            "node_modules/@expo-google-fonts/playfair-display/PlayfairDisplay_500Medium.ttf",
+            "node_modules/@expo-google-fonts/playfair-display/PlayfairDisplay_600SemiBold.ttf",
+            "node_modules/@expo-google-fonts/playfair-display/PlayfairDisplay_700Bold.ttf"
+          ]
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
