@@ -20,6 +20,7 @@ import {
   Navigation,
   AlertTriangle,
   MapPin,
+  Crosshair,
   ChevronRight,
   Database,
   Download,
@@ -155,12 +156,50 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <VarunaWordmark scale={0.62} />
           </View>
 
-          {/* Right: Offline Ready Pill, Bell Notification, Captain Avatar */}
+          {/* Right: GPS Locked Status Pill, Offline Ready Pill, Bell Notification, Captain Avatar */}
           <View style={styles.headerActions}>
-            <View style={styles.offlineReadyPill}>
-              <Waveform size={11} color="#00e676" />
-              <Text style={styles.offlineReadyText}>Offline Ready</Text>
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (telemetry.permissionStatus !== 'granted') {
+                  telemetry.requestGpsPermission();
+                } else {
+                  telemetry.resetToGps();
+                }
+              }}
+              style={[
+                styles.statusPill,
+                telemetry.permissionStatus === 'denied' && styles.statusPillDenied,
+                telemetry.permissionStatus === 'requesting' && styles.statusPillPending,
+              ]}
+            >
+              <Crosshair
+                size={10}
+                color={
+                  telemetry.isGpsLocked
+                    ? '#00e5ff'
+                    : telemetry.permissionStatus === 'requesting'
+                    ? '#f59e0b'
+                    : '#8da2be'
+                }
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  telemetry.permissionStatus === 'denied' && styles.statusTextDenied,
+                  telemetry.permissionStatus === 'requesting' && styles.statusTextPending,
+                ]}
+              >
+                {telemetry.isGpsLocked
+                  ? 'GPS Locked'
+                  : telemetry.permissionStatus === 'requesting'
+                  ? 'Acquiring...'
+                  : telemetry.permissionStatus === 'denied'
+                  ? 'GPS Off'
+                  : 'Enable GPS'}
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               activeOpacity={0.8}
@@ -326,9 +365,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* Liquid Glass Weather & Marine Conditions Card with Alerts */}
           <LiquidGlassWeatherCard
-            locationName={telemetry.locationName || 'Local Waters'}
+            locationName={telemetry.locationName || 'Live Vessel GPS'}
             regionName={telemetry.regionName}
+            coordinates={telemetry.coordinates}
+            isGpsLocked={telemetry.isGpsLocked}
             isCustomLocation={telemetry.isCustomLocation}
+            lastUpdated={telemetry.lastUpdated}
             conditions={telemetry.conditions}
             weather={telemetry.weather}
             alerts={telemetry.alerts}
@@ -469,6 +511,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0, 229, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 229, 255, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 4.5,
+    borderRadius: 9999,
+  },
+  statusPillDenied: {
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  statusPillPending: {
+    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  statusText: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 9,
+    color: '#00e5ff',
+  },
+  statusTextDenied: {
+    color: '#ef4444',
+  },
+  statusTextPending: {
+    color: '#f59e0b',
   },
   offlineReadyPill: {
     flexDirection: 'row',

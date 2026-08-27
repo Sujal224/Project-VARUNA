@@ -150,6 +150,11 @@ class MapIntelligenceRequest(BaseModel):
 
 class MapIntelligenceResponse(BaseModel):
     user_location: Coordinates
+    location_name: str = Field("Live Vessel GPS", description="Primary detected location or city name")
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    is_maritime_water: bool = False
     region_name: str
     nearest_ocean: str
     conditions: MarineConditions
@@ -159,4 +164,5 @@ class MapIntelligenceResponse(BaseModel):
     safe_routes: List[SafeRoute]
     alerts: List[MapAlertItem]
     recommendation: Optional[MapRecommendation] = None
+
 

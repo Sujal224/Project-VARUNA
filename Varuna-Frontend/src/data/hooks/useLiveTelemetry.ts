@@ -164,8 +164,8 @@ export const useLiveTelemetry = (): UseLiveTelemetryResult => {
   return {
     gpsState,
     coordinates: gpsState.coords,
-    locationName,
-    regionName,
+    locationName: locationName || (gpsState.isGpsLocked ? 'Live Vessel GPS' : 'Local Waters'),
+    regionName: regionName || intelligence?.region_name || intelligence?.nearest_ocean || 'Maritime Zone',
     isCustomLocation,
     isGpsLocked: gpsState.isGpsLocked,
     permissionStatus: gpsState.permissionStatus,

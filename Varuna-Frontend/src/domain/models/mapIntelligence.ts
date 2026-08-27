@@ -154,6 +154,8 @@ export interface MapIntelligenceRequest {
  */
 export interface MapIntelligenceResponse {
   user_location: Coordinates;
+  region_name?: string;
+  nearest_ocean?: string;
   conditions: MarineConditions;
   weather: WeatherIntelligence;
   pfz: {

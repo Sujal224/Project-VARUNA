@@ -1,7 +1,7 @@
 /**
  * VARUNA Liquid Glass Marine Weather & Atmospheric Intelligence Card
- * Apple-grade luxury frosted liquid glass card with live weather,
- * multi-parameter marine physics, and dynamic alerts.
+ * Apple-grade luxury frosted liquid glass card with live real-time GPS location,
+ * multi-parameter marine physics, tidal/solar telemetry, and dynamic alerts.
  */
 
 import React from 'react';
@@ -12,6 +12,8 @@ import {
   ChevronRight,
   CloudSun,
   Sun,
+  Sunrise,
+  Sunset,
   CloudRain,
   CloudLightning,
   Wind,
@@ -20,16 +22,25 @@ import {
   Droplets,
   AlertTriangle,
   ShieldCheck,
-  Eye,
+  Navigation,
   Compass,
+  Radio,
 } from 'lucide-react-native';
 import * as Haptics from '../../../utils/haptics';
-import { MarineConditions, WeatherIntelligence, MapAlertItem } from '../../../domain/models/mapIntelligence';
+import {
+  Coordinates,
+  MarineConditions,
+  WeatherIntelligence,
+  MapAlertItem,
+} from '../../../domain/models/mapIntelligence';
 
 interface LiquidGlassWeatherCardProps {
   locationName: string;
   regionName?: string;
+  coordinates?: Coordinates;
+  isGpsLocked?: boolean;
   isCustomLocation?: boolean;
+  lastUpdated?: number;
   conditions: MarineConditions | null;
   weather: WeatherIntelligence | null;
   alerts?: MapAlertItem[];
@@ -40,7 +51,10 @@ interface LiquidGlassWeatherCardProps {
 export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
   locationName,
   regionName,
-  isCustomLocation,
+  coordinates,
+  isGpsLocked = false,
+  isCustomLocation = false,
+  lastUpdated,
   conditions,
   weather,
   alerts = [],
@@ -48,7 +62,7 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
   onPressAlerts,
 }) => {
   // Extract or fallback metrics
-  const tempC = weather?.current?.temperature_c ?? conditions?.sea_temperature ?? 28.0;
+  const tempC = weather?.current?.temperature_c ?? conditions?.sea_temperature ?? 28.4;
   const conditionText = weather?.current?.condition_text ?? 'Partly Cloudy • Optimal Nav Flow';
   const windSpeed = conditions?.wave_speed ?? weather?.current?.wind_speed_kmh ?? 14.0;
   const windGust = weather?.current?.wind_gust_kmh ?? Math.round(windSpeed * 1.3);
@@ -59,11 +73,25 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
   const humidity = weather?.current?.humidity_percent ?? 68;
   const uvIndex = weather?.current?.uv_index ?? 4.5;
   const visibilityKm = weather?.current?.visibility_km ?? 10.0;
+  const currentKnots = conditions?.current_speed_knots ?? 1.4;
+  const sunriseTime = weather?.sunrise || '05:42 AM';
+  const sunsetTime = weather?.sunset || '06:18 PM';
+  const tideState = weather?.tide_state || 'Mid Flood';
+
+  // Format Nautical Coordinates: e.g. "17.38°N, 83.25°E"
+  const formattedCoords = React.useMemo(() => {
+    if (!coordinates || (coordinates.latitude === 0 && coordinates.longitude === 0)) {
+      return '17.38°N, 83.25°E';
+    }
+    const latDir = coordinates.latitude >= 0 ? 'N' : 'S';
+    const lonDir = coordinates.longitude >= 0 ? 'E' : 'W';
+    return `${Math.abs(coordinates.latitude).toFixed(2)}°${latDir}, ${Math.abs(coordinates.longitude).toFixed(2)}°${lonDir}`;
+  }, [coordinates]);
 
   // Active top alert
   const primaryAlert = alerts.length > 0 ? alerts[0] : {
     id: 'default-safe',
-    title: 'Open-Meteo Synced • Clear Corridor',
+    title: 'Open-Meteo Live Synced • Clear Nav Corridor',
     severity: 'Low Risk',
     type: 'advisory',
   };
@@ -94,34 +122,55 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
       <View style={styles.glassContainer}>
         {/* Top Specular Liquid Glass Edge Highlight */}
         <LinearGradient
-          colors={['rgba(255, 255, 255, 0.28)', 'rgba(0, 229, 255, 0.4)', 'rgba(255, 255, 255, 0.05)']}
+          colors={['rgba(255, 255, 255, 0.35)', 'rgba(0, 229, 255, 0.45)', 'rgba(255, 255, 255, 0.05)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.specularTopBorder}
         />
 
-        {/* 1. Header Row: Location Pill & Live Satellite Sync Status */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onPressLocation?.();
-            }}
-            style={styles.locationPill}
-          >
-            <MapPin size={12} color="#00e5ff" />
-            <Text style={styles.locationTitle} numberOfLines={1}>
-              {locationName || 'Coastal Waters'}
-            </Text>
-            <ChevronRight size={13} color="#8da2be" />
-          </TouchableOpacity>
+        {/* 1. Real-Time Location Header: Name, Coordinates & Live GPS Lock */}
+        <TouchableOpacity
+          activeOpacity={0.82}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onPressLocation?.();
+          }}
+          style={styles.locationHeaderContainer}
+        >
+          <View style={styles.locationHeaderLeft}>
+            <View
+              style={[
+                styles.locationIconGlow,
+                isGpsLocked ? styles.locationIconGlowGps : isCustomLocation ? styles.locationIconGlowPort : {},
+              ]}
+            >
+              {isGpsLocked ? (
+                <Navigation size={14} color="#00e676" />
+              ) : isCustomLocation ? (
+                <MapPin size={14} color="#00e5ff" />
+              ) : (
+                <Radio size={14} color="#38bdf8" />
+              )}
+            </View>
 
-          <View style={styles.liveSatelliteBadge}>
-            <View style={styles.pulsingGreenDot} />
-            <Text style={styles.liveSatelliteText}>Satellite Live</Text>
+            <View style={styles.locationTitleColumn}>
+              <View style={styles.locationPrimaryRow}>
+                <Text style={styles.locationMainTitle} numberOfLines={1}>
+                  {locationName || 'Live Vessel GPS'}
+                </Text>
+                <ChevronRight size={14} color="#64748b" style={styles.locationChevron} />
+              </View>
+
+              <View style={styles.locationSubRow}>
+                <Text style={styles.coordinatesText}>{formattedCoords}</Text>
+                <View style={styles.metaDot} />
+                <Text style={styles.regionSubText} numberOfLines={1}>
+                  {regionName || 'Bay of Bengal'}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* 2. Hero Climate Section: Big Temp + Dynamic Condition + High/Low */}
         <View style={styles.heroClimateRow}>
@@ -151,7 +200,9 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
               <Wind size={13} color="#00e5ff" />
               <Text style={styles.gridLabel}>Wind Vector</Text>
             </View>
-            <Text style={styles.gridValue}>{windSpeed} <Text style={styles.gridUnit}>km/h</Text></Text>
+            <Text style={styles.gridValue}>
+              {windSpeed} <Text style={styles.gridUnit}>km/h</Text>
+            </Text>
             <Text style={styles.gridSubtext}>{windDir}° ESE • Gust {windGust}</Text>
           </View>
 
@@ -161,7 +212,9 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
               <Waves size={13} color="#38bdf8" />
               <Text style={styles.gridLabel}>Wave Dynamics</Text>
             </View>
-            <Text style={styles.gridValue}>{waveHeight} <Text style={styles.gridUnit}>m</Text></Text>
+            <Text style={styles.gridValue}>
+              {waveHeight} <Text style={styles.gridUnit}>m</Text>
+            </Text>
             <Text style={styles.gridSubtext}>{swellPeriod}s Swell • Stable</Text>
           </View>
 
@@ -171,7 +224,9 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
               <Gauge size={13} color="#00e676" />
               <Text style={styles.gridLabel}>Barometer</Text>
             </View>
-            <Text style={styles.gridValue}>{Math.round(pressureHpa)} <Text style={styles.gridUnit}>hPa</Text></Text>
+            <Text style={styles.gridValue}>
+              {Math.round(pressureHpa)} <Text style={styles.gridUnit}>hPa</Text>
+            </Text>
             <Text style={styles.gridSubtext}>Steady Gradient</Text>
           </View>
 
@@ -181,12 +236,48 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
               <Droplets size={13} color="#a78bfa" />
               <Text style={styles.gridLabel}>Humidity / UV</Text>
             </View>
-            <Text style={styles.gridValue}>{humidity}<Text style={styles.gridUnit}>%</Text></Text>
+            <Text style={styles.gridValue}>
+              {humidity}
+              <Text style={styles.gridUnit}>%</Text>
+            </Text>
             <Text style={styles.gridSubtext}>UV {uvIndex} • Vis {visibilityKm}km</Text>
           </View>
         </View>
 
-        {/* 4. Live Marine Advisory & Warning Alert Glass Strip */}
+        {/* 4. Solar & Tidal Intelligence Ribbon */}
+        <View style={styles.marineRibbonContainer}>
+          <View style={styles.marineRibbonItem}>
+            <Sunrise size={12} color="#f59e0b" />
+            <Text style={styles.marineRibbonLabel}>Rise</Text>
+            <Text style={styles.marineRibbonValue}>{sunriseTime}</Text>
+          </View>
+
+          <View style={styles.marineRibbonDivider} />
+
+          <View style={styles.marineRibbonItem}>
+            <Sunset size={12} color="#f97316" />
+            <Text style={styles.marineRibbonLabel}>Set</Text>
+            <Text style={styles.marineRibbonValue}>{sunsetTime}</Text>
+          </View>
+
+          <View style={styles.marineRibbonDivider} />
+
+          <View style={styles.marineRibbonItem}>
+            <Waves size={12} color="#00e5ff" />
+            <Text style={styles.marineRibbonLabel}>Tide</Text>
+            <Text style={styles.marineRibbonValue}>{tideState}</Text>
+          </View>
+
+          <View style={styles.marineRibbonDivider} />
+
+          <View style={styles.marineRibbonItem}>
+            <Compass size={12} color="#00e676" />
+            <Text style={styles.marineRibbonLabel}>Flow</Text>
+            <Text style={styles.marineRibbonValue}>{currentKnots} kts</Text>
+          </View>
+        </View>
+
+        {/* 5. Live Marine Advisory & Warning Alert Glass Strip */}
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => {
@@ -200,11 +291,13 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
           ]}
         >
           <View style={styles.alertLeftGroup}>
-            <View style={[
-              styles.alertIconCircle,
-              isHighAlert && styles.alertIconCircleHigh,
-              isModerateAlert && styles.alertIconCircleModerate,
-            ]}>
+            <View
+              style={[
+                styles.alertIconCircle,
+                isHighAlert && styles.alertIconCircleHigh,
+                isModerateAlert && styles.alertIconCircleModerate,
+              ]}
+            >
               {isHighAlert ? (
                 <AlertTriangle size={13} color="#ef4444" />
               ) : isModerateAlert ? (
@@ -222,16 +315,20 @@ export const LiquidGlassWeatherCard: React.FC<LiquidGlassWeatherCardProps> = ({
           </View>
 
           <View style={styles.alertRightGroup}>
-            <View style={[
-              styles.severityPill,
-              isHighAlert && styles.severityPillHigh,
-              isModerateAlert && styles.severityPillModerate,
-            ]}>
-              <Text style={[
-                styles.severityText,
-                isHighAlert && styles.severityTextHigh,
-                isModerateAlert && styles.severityTextModerate,
-              ]}>
+            <View
+              style={[
+                styles.severityPill,
+                isHighAlert && styles.severityPillHigh,
+                isModerateAlert && styles.severityPillModerate,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.severityText,
+                  isHighAlert && styles.severityTextHigh,
+                  isModerateAlert && styles.severityTextModerate,
+                ]}
+              >
                 {primaryAlert.severity}
               </Text>
             </View>
@@ -253,25 +350,24 @@ const styles = StyleSheet.create({
   ambientAura: {
     position: 'absolute',
     top: 10,
-    left: '15%',
-    right: '15%',
-    height: 120,
-    backgroundColor: 'rgba(0, 229, 255, 0.08)',
+    left: '12%',
+    right: '12%',
+    height: 140,
+    backgroundColor: 'rgba(0, 229, 255, 0.09)',
     borderRadius: 90,
-    filter: 'blur(32px)',
   },
   glassContainer: {
-    backgroundColor: 'rgba(7, 20, 38, 0.82)',
+    backgroundColor: 'rgba(6, 18, 35, 0.84)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.09)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 22,
     padding: 16,
-    gap: 14,
+    gap: 13,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.45,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOpacity: 0.5,
+    shadowRadius: 22,
+    elevation: 9,
     overflow: 'hidden',
   },
   specularTopBorder: {
@@ -281,50 +377,138 @@ const styles = StyleSheet.create({
     right: 0,
     height: 1.5,
   },
-  headerRow: {
+
+  // 1. Location Header Styles
+  locationHeaderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
   },
-  locationPill: {
+  locationHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+    marginRight: 8,
+  },
+  locationIconGlow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 229, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 229, 255, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationIconGlowGps: {
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    borderColor: 'rgba(0, 230, 118, 0.35)',
+  },
+  locationIconGlowPort: {
+    backgroundColor: 'rgba(0, 229, 255, 0.14)',
+    borderColor: 'rgba(0, 229, 255, 0.35)',
+  },
+  locationTitleColumn: {
+    flex: 1,
+    gap: 1,
+  },
+  locationPrimaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  locationMainTitle: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 13.5,
+    color: '#ffffff',
+    letterSpacing: -0.2,
+  },
+  locationChevron: {
+    opacity: 0.6,
+  },
+  locationSubRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
   },
-  locationTitle: {
+  coordinatesText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 11.5,
-    color: '#ffffff',
-    maxWidth: 160,
+    fontSize: 10.5,
+    color: '#38bdf8',
+    letterSpacing: -0.1,
   },
-  liveSatelliteBadge: {
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#64748b',
+  },
+  regionSubText: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 10.5,
+    color: '#94a3b8',
+    flexShrink: 1,
+  },
+
+  // GPS / Status Badge
+  gpsStatusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4.5,
-    backgroundColor: 'rgba(0, 230, 118, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.28)',
+    gap: 5,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 4.5,
     borderRadius: 12,
+    borderWidth: 1,
   },
-  pulsingGreenDot: {
+  gpsStatusBadgeLocked: {
+    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    borderColor: 'rgba(0, 230, 118, 0.3)',
+  },
+  gpsStatusBadgePort: {
+    backgroundColor: 'rgba(0, 229, 255, 0.1)',
+    borderColor: 'rgba(0, 229, 255, 0.28)',
+  },
+  gpsStatusBadgeSyncing: {
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderColor: 'rgba(245, 158, 11, 0.28)',
+  },
+  pulsingDot: {
     width: 5,
     height: 5,
     borderRadius: 2.5,
+  },
+  pulsingDotLocked: {
     backgroundColor: '#00e676',
   },
-  liveSatelliteText: {
+  pulsingDotPort: {
+    backgroundColor: '#00e5ff',
+  },
+  pulsingDotSyncing: {
+    backgroundColor: '#f59e0b',
+  },
+  gpsStatusText: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 9.5,
+    letterSpacing: -0.1,
+  },
+  gpsStatusTextLocked: {
     color: '#00e676',
   },
+  gpsStatusTextPort: {
+    color: '#00e5ff',
+  },
+  gpsStatusTextSyncing: {
+    color: '#f59e0b',
+  },
+
+  // 2. Hero Climate Section
   heroClimateRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -355,7 +539,7 @@ const styles = StyleSheet.create({
   },
   conditionSummaryText: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
+    fontSize: 13.5,
     color: '#e2edfd',
     letterSpacing: -0.1,
   },
@@ -382,6 +566,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 12,
   },
+
+  // 3. Metrics Grid
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -390,7 +576,7 @@ const styles = StyleSheet.create({
   gridCard: {
     flexBasis: '48%',
     flexGrow: 1,
-    backgroundColor: 'rgba(4, 14, 28, 0.55)',
+    backgroundColor: 'rgba(4, 14, 28, 0.6)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 14,
@@ -423,6 +609,41 @@ const styles = StyleSheet.create({
     fontSize: 9.5,
     color: '#64748b',
   },
+
+  // 4. Solar & Tidal Intelligence Ribbon
+  marineRibbonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(2, 10, 22, 0.65)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  marineRibbonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  marineRibbonLabel: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 9.5,
+    color: '#64748b',
+  },
+  marineRibbonValue: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10.5,
+    color: '#e2edfd',
+  },
+  marineRibbonDivider: {
+    width: 1,
+    height: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+
+  // 5. Marine Alert Banner
   alertBanner: {
     flexDirection: 'row',
     alignItems: 'center',
