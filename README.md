@@ -50,6 +50,25 @@ The platform focuses on:
 
 ---
 
+# Offline-First & Adaptive Intelligence
+
+> **Connectivity should enhance VARUNA — not define whether it works.**
+
+Marine operations can take place far beyond reliable network coverage. VARUNA is therefore designed around an **offline-first intelligence architecture**, where essential marine knowledge, local data, and AI capabilities can continue operating on the device when connectivity is unavailable.
+
+### Device-Adaptive AI
+
+VARUNA can dynamically select the appropriate intelligence configuration based on the capabilities of the device.
+
+Instead of forcing the same large model onto every device, the intelligence layer can select between:
+
+- Quantized LLMs
+- Small Language Models (SLMs)
+- Lightweight task-specific models
+- Deterministic local processing
+- Cloud-based models when connectivity and resources permit
+
+
 ## Product Showcase
 
 <table>
@@ -210,3 +229,63 @@ Each alert provides contextual information such as location, severity, environme
 
 ---
 
+## Marine Intelligence
+
+VARUNA brings multiple marine signals into a unified intelligence layer.
+
+### Environmental Intelligence
+
+- Sea Surface Temperature
+- Chlorophyll concentration
+- Potential Fishing Zones
+- Wave height and swell
+- Wind conditions
+- Tides and currents
+- Weather conditions
+- Cyclone activity
+
+### Geospatial Intelligence
+
+- Bathymetry
+- Vessel positioning
+- Nautical map layers
+- Seamarks
+- Geographic coordinates
+- Marine zones
+
+---
+
+## Potential Fishing Zone Intelligence
+
+VARUNA goes beyond displaying PFZ locations by providing contextual information around potential fishing areas.
+
+The interface can present:
+
+- PFZ match
+- Coordinates
+- Distance and bearing
+- Thermal SST front
+- Seabed depth
+- Chlorophyll concentration
+- Target species
+- Estimated travel context
+
+Example:
+
+```text
+Potential Fishing Zone
+
+87% Match
+
+Sector Alpha
+22.84°N, 86.31°E
+
+Distance / Bearing     7.6 NM
+Thermal SST Front      28.4°C
+Seabed Depth           64 m
+Chlorophyll            2.4 mg/m³
+
+Target Species
+Yellowfin Tuna
+Indian Mackerel
+Skipjack
