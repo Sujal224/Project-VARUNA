@@ -1,23 +1,16 @@
+# SMART INDIA HACKATHON 2026
+
+## SIH26176 — ORCA: Marine EcOsystem Reasoning with Collaborative Agents
+
 # VARUNA — Marine Intelligence
 
 > **Safer Seas. Smarter Decisions.**
 
-**VARUNA** is an **Agentic AI-powered Marine Intelligence Platform** developed as a solution for **Smart India Hackathon 2026 — Problem Statement SIH26176**.
+VARUNA is an **Agentic AI-powered Marine Intelligence Platform** developed as a solution for **Smart India Hackathon 2026 — Problem Statement SIH26176**.
 
 It transforms complex marine, oceanographic, weather, and geospatial data into **contextual, explainable, and actionable intelligence** for marine stakeholders.
 
 Built with **React Native, Expo, and TypeScript**.
-
----
-
-## Smart India Hackathon
-
-> ### **Problem Statement: SIH26176**
-> **ORCA — Marine EcOsystem Reasoning with Collaborative Agents**
->
-> **Organization:** Indian Space Research Organisation (ISRO)  
-> **Theme:** Miscellaneous  
-> **Track:** Software
 
 ---
 
@@ -27,7 +20,7 @@ Built with **React Native, Expo, and TypeScript**.
 
 Marine stakeholders such as fishermen, researchers, coastal authorities, disaster management agencies, and maritime operators rely on large volumes of oceanographic, meteorological, satellite, and geospatial information.
 
-However, this information is distributed across multiple sources and requires complex reasoning to answer practical questions such as:
+This information is distributed across multiple sources and requires complex reasoning to answer practical questions such as:
 
 - Where is the nearest Potential Fishing Zone?
 - Is it safe to venture into the sea?
@@ -38,7 +31,7 @@ However, this information is distributed across multiple sources and requires co
 
 The core challenge is not simply retrieving individual datasets, but **correlating information from multiple heterogeneous sources and transforming it into explainable, context-aware recommendations.**
 
-### The VARUNA Solution
+### VARUNA's Approach
 
 VARUNA addresses this challenge through an **agentic marine intelligence layer** capable of understanding natural-language queries, coordinating specialized AI capabilities, analyzing marine and geospatial information, and producing contextual decision support.
 
