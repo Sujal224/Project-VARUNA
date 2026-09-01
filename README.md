@@ -255,6 +255,13 @@ VARUNA brings multiple marine signals into a unified intelligence layer.
 
 ---
 
+### Adaptive Battery & Compute Optimization
+
+VARUNA can continuously adapt its AI workload according to the device's **battery level, charging state, thermal condition, available memory, CPU/GPU capacity, and network availability**.
+
+Instead of running the maximum available intelligence at all times, VARUNA can automatically select an appropriate compute profile to preserve battery life while maintaining essential marine intelligence.
+
+
 ## Potential Fishing Zone Intelligence
 
 VARUNA goes beyond displaying PFZ locations by providing contextual information around potential fishing areas.
